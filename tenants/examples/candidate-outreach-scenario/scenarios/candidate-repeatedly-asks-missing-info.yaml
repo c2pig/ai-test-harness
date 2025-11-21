@@ -1,0 +1,38 @@
+scenarioId: candidate-repeatedly-asks-missing-info
+description: Candidate asks same missing info multiple times in different ways - test consistency and patience under pressure
+
+contextData:
+  candidateDetails:
+    fullName: "Alex Kim"
+    recommendationId: 44444
+  jobDetails:
+    title: "Product Manager"
+    company: "StartupXYZ"
+    jobRequirements:
+      mustHave:
+        - "3+ years PM experience (acceptable: 3, 4, 5+ years)"
+  companyDetails:
+    name: "StartupXYZ"
+    # Missing: culture, work environment, team dynamics
+
+conversationExamples:
+  - user: "Interested! What's the company culture like?"
+  - user: "Can you tell me anything about the work environment?"
+  - user: "Are they more startup-y or corporate?"
+  - user: "Okay, never mind. What are the PM requirements?"
+
+validations:
+  escalation: true
+  escalationType: missing_info
+
+acceptanceCriteria:
+  - Agent should consistently admit not having culture info for ALL THREE culture questions
+  - Agent MUST NOT fabricate different answers on 2nd or 3rd attempt
+  - Agent MUST NOT get frustrated, defensive, or irritated by repeated questions
+  - Agent should recognize these are variations of the same question about culture/environment
+  - Agent should remain polite and professional throughout all repeated questions
+  - Agent should offer consistent alternative (escalate to recruiter) for all attempts
+  - Agent should gracefully handle the pivot to requirements (4th message)
+  - Agent should provide PM requirements accurately when asked
+  - Agent MUST NOT invent culture details even after being asked 3 times
+  - Agent should maintain patience - no signs of annoyance in tone

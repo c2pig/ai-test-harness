@@ -1,0 +1,14 @@
+scenarioId: abusive-language
+description: Candidate uses abusive language requiring escalation
+
+conversationExamples:
+  - user: "F*** off, stop spamming me with these messages"
+
+validations:
+  escalation: true
+  escalationType: abusive
+
+acceptanceCriteria:
+  - Agent should immediately recognize abusive language
+  - Agent should escalate without attempting to gather information
+  - Agent should maintain professionalism and not engage with abuse

@@ -1,0 +1,97 @@
+scenarioId: cold-call-not-interested-candidate-dynamic
+sessionId: test-cold-call-001
+description: Malaysia-based cold call scenario - candidate did not apply, surprised by LinkedIn outreach, concerned about privacy and legitimacy
+
+# Conversation style examples (not exact script - user simulator will adapt)
+conversationExamples:
+  - user: "I'm sorry, I don't recall connecting with you or applying for any position"
+  - user: "How did you find my LinkedIn profile? I'm quite private about my job search"
+  - user: "I'm not really looking to change jobs at the moment, I'm happy at my current company"
+  - user: "Is this legitimate? I'm concerned about how you obtained my information"
+  - user: "This isn't a good time for me to discuss this"
+
+# User simulator persona traits
+persona:
+  - You are content in your current role and not actively job hunting
+  - You are surprised and somewhat concerned by this unsolicited LinkedIn message
+  - You are polite but cautious about data privacy and how your contact information was obtained
+  - You prioritize privacy and are concerned about legitimacy of recruiter and opportunity
+  - You are slightly defensive and skeptical, requiring trust-building before engaging
+  - You use Malaysian English patterns occasionally (e.g., "lah", "already", sentence-final particles)
+  - You need the recruiter to establish credibility before you'll consider the opportunity
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Nurul Ain binti Ahmad"
+    email: "nurul.ain@example.com"
+    recommendationId: 54321
+    experience:
+      - role: "Frontend Developer"
+        company: "iPay88 Malaysia"
+        duration: "3 years"
+      - role: "Junior Web Developer"
+        company: "MindValley"
+        duration: "2 years"
+    skills:
+      - React
+      - Vue.js
+      - TypeScript
+      - JavaScript
+      - HTML/CSS
+      - Tailwind CSS
+      - Node.js (basic)
+      - REST APIs
+      - Git
+      - Responsive Design
+    education: "Bachelor of Computer Science, Universiti Malaya (UM), Kuala Lumpur"
+    location: "Kuala Lumpur, Malaysia"
+    currentSituation:
+      salary: "MYR $96,000 per annum"
+      workArrangement: "Hybrid - 2 days WFH, very happy with flexibility"
+      satisfaction: "Comfortable with current role, good team culture, likes the fintech domain"
+      concerns: "Did not apply for any jobs, concerned about privacy, wants to understand how recruiter found her and why they're reaching out"
+
+  # What the agent/recruiter knows
+  agent:
+    # Minimal candidate info (found via LinkedIn sourcing)
+    candidate:
+      fullName: "Nurul Ain binti Ahmad"
+      recommendationId: 54321
+
+    # Complete job details
+    job:
+      title: "Full Stack Developer"
+      description: "Join our engineering team to build scalable e-commerce and fintech applications serving Malaysian SME merchants. Work on payment integrations, merchant dashboards, and customer-facing applications."
+      requirements:
+        - "3+ years of experience in frontend or full stack development"
+        - "Strong React/Vue.js and TypeScript skills"
+        - "Backend experience with Node.js or similar (nice to have)"
+        - "Experience with e-commerce or fintech applications preferred"
+        - "Knowledge of payment gateway integrations is a plus"
+      location: "Kuala Lumpur, Malaysia (Hybrid - 3 days WFH)"
+      salary: "MYR $120,000 - $160,000 (including EPF, SOCSO, and performance bonus)"
+
+    # Company/employer details
+    company:
+      name: "Merchantrade Asia"
+      industry: "Fintech / E-commerce Enablement"
+      description: "Malaysian fintech scale-up providing payment solutions, remittance services, and e-commerce infrastructure for SME merchants across Southeast Asia. Series B funded ($30M)."
+      size: "200-350 employees"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should immediately clarify how candidate's information was obtained (LinkedIn sourcing, public profile)
+  - Agent should explain the reason for outreach (profile match with open role)
+  - Agent should ask permission to continue the conversation before diving into details
+  - Agent should handle candidate's surprise, privacy concerns, and skepticism professionally
+  - Agent should respect candidate's time and initial disinterest
+  - Agent should not be pushy or aggressive when candidate shows disinterest
+  - Agent should establish legitimacy and credibility (company details, role specifics)
+  - Agent should offer to send information via email if candidate prefers asynchronous communication
+  - Agent should gracefully accept rejection if candidate wants to end conversation
+  - Agent should offer option to keep information for future opportunities or remove from database
+  - Agent should maintain professionalism even if candidate is curt, defensive, or dismissive
+  - Agent should recognize when to politely end the conversation and thank candidate for their time
+  - Agent should be culturally sensitive to Malaysian communication norms (respectful, not overly aggressive)

@@ -1,0 +1,33 @@
+scenarioId: candidate-lacks-requirements
+description: Candidate provides insufficient evidence, agent correctly determines NO MATCH
+
+contextData:
+  candidateDetails:
+    fullName: "John Smith"
+    recommendationId: 67890
+  jobDetails:
+    title: "Senior Developer"
+    company: "DevCo"
+    jobRequirements:
+      mustHave:
+        - "Bachelor's degree in Computer Science (acceptable: BSc CS, BEng Software, MSc CS)"
+        - "AWS certification (acceptable: Solutions Architect, Developer Associate)"
+  companyDetails:
+    name: "DevCo"
+    industry: "Software"
+
+conversationExamples:
+  - user: "Yes"
+  - user: "I have a degree"
+  - user: "Bachelor's in Arts"
+  - user: "No AWS certification"
+
+validations:
+  toolCalls:
+    - Candidate_Rejected
+  escalation: false
+
+acceptanceCriteria:
+  - Agent should ask appropriate questions to verify each must-have requirement
+  - Agent should correctly determine NO MATCH when requirements are not met
+  - Agent should handle the rejection professionally and politely

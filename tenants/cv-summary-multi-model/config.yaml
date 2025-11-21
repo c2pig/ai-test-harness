@@ -1,0 +1,47 @@
+# Project Configuration
+schemaVersion: "1.0.0"
+
+project:
+  name: spec-summary-multi-model
+  description: multiple model comparison for cv summary
+
+testPlan:
+  type: text-generation
+
+  prompt: spec-summary-v2-prompt
+  sampleSize: 40
+
+  connectors:
+    # Data connector references a connector from config/shared/connectors.yaml
+    # The default 'local-example-data' uses local JSON files in local/examples/data-sample/cloudwatch.json
+    logs: local-spec-summary-sources-large
+
+  # LLM configuration for text generation
+  llmConfig:
+    # - modelId: bedrock:amazon.nova-lite-v1:0
+    # - modelId: bedrock:amazon.nova-micro-v1:0
+    # - modelId: bedrock:amazon.nova-pro-v1:0
+    - modelId: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+    - modelId: us.meta.llama4-maverick-17b-instruct-v1:0
+    - modelId: qwen.qwen3-235b-a22b-2507-v1:0
+    - modelId: openai.gpt-oss-120b-1:0
+    - modelId: deepseek.v3-v1:0
+
+evaluationPlan:
+  # Judge model evaluates the quality of generated text
+  judgeModel:
+    modelId: bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0
+
+  qualityAssessment:
+    attributes:
+      - ZeroHallucination
+      - custom/quality/PIIRemoval
+      - custom/quality/XMLFormatCompliance
+      - custom/quality/MarkdownFormatting
+      - custom/quality/BulletStructureCompliance
+      - custom/quality/ConditionalLogicCompliance
+      - custom/quality/ContentRelevance
+      - custom/quality/Conciseness
+
+    solutionDescription: "multiple model comparison for cv summary"
+    calibrationPath: "./evaluation/calibration.yaml"

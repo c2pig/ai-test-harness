@@ -1,0 +1,105 @@
+scenarioId: bahasa-melayu-only-candidate-dynamic
+sessionId: test-bahasa-001
+description: Malaysia-based candidate who speaks only Bahasa Melayu (100% Bahasa conversation) - tests AI recruiter's ability to handle non-English languages
+
+# Conversation style examples (100% Bahasa Melayu with Malaysian shortforms/casual style)
+conversationExamples:
+  - user: "Hai. Saya tgh kerja kat Petronas skrg ni. Bleh cerita sikit pasal jawatan ni?"
+  - user: "Gaji brp? Gaji saya skrg RM8k sebulan"
+  - user: "Ada medical insurance x? Mcm mana dgn working hours?"
+  - user: "Maaf ye, saya x reti ckp English. Bleh kita berbual dlm BM je?"
+  - user: "Ok terima kasih. Nanti saya pk dulu, kalau berminat saya msg balik"
+  - user: "Position ni buat apa sbnrnya? Guna tech stack apa?"
+  - user: "Kena datang office ke atau bleh WFH? Saya prefer flexible skit"
+
+# User simulator persona traits (written in English for system, but candidate speaks 100% Bahasa Melayu)
+persona:
+  - You speak ONLY Bahasa Melayu - you do not speak English at all
+  - You use Malaysian casual texting style with common shortforms (tgh=tengah, skrg=sekarang, bleh=boleh, x=tak, kat=kat, sbnrnya=sebenarnya, dgn=dengan, sj=saje, etc.)
+  - You are a Malaysian professional from a Malay-medium education background
+  - You mix casual BM with occasional English tech terms when necessary (e.g., "tech stack", "WFH", "medical insurance")
+  - You are comfortable and fluent in Bahasa Melayu technical terminology
+  - You will not switch to full English even if the recruiter speaks English
+  - You may not understand complex English questions and will ask to repeat in Bahasa Melayu
+  - You communicate in relaxed, conversational Malaysian style (not overly formal)
+  - You use Malaysian expressions (e.g., "terima kasih", "ok", "nanti", "kalau", "ye")
+  - If recruiter cannot communicate in Bahasa Melayu, you will politely suggest finding a Malay-speaking recruiter or using translated written messages
+  - Your willingness to change jobs is 30% baseline, can increase to 50% if recruiter handles language barrier professionally and presents good opportunity
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Muhammad Hafiz bin Abdullah"
+    email: "hafiz.abdullah@example.com"
+    recommendationId: 89234
+    experience:
+      - role: "Pembangun Perisian Kanan (Senior Software Developer)"
+        company: "Petronas ICT Sdn Bhd"
+        duration: "5 tahun (5 years)"
+      - role: "Pembangun Perisian (Software Developer)"
+        company: "Telekom Malaysia (TM)"
+        duration: "3 tahun (3 years)"
+    skills:
+      - Java
+      - Spring Framework
+      - Oracle Database
+      - MySQL
+      - REST API
+      - Microservices (Seni Bina Mikroperkhidmatan)
+      - Agile (Pembangunan Agile)
+    education: "Ijazah Sarjana Muda Sains Komputer, Universiti Kebangsaan Malaysia (UKM) - pendidikan dalam Bahasa Melayu (Bachelor of Computer Science, National University of Malaysia - education in Bahasa Melayu)"
+    location: "Kuala Lumpur, Malaysia"
+    languageAbility:
+      bahasaMelayu: "Bahasa ibunda (Native)"
+      english: "Tidak fasih - hanya boleh baca dokumentasi teknikal asas (Not fluent - can only read basic technical documentation)"
+    currentSituation:
+      currentSalary: "MYR $96,000 setahun (per annum)"
+      satisfaction: "Agak berpuas hati dengan kerja sekarang, tetapi terbuka kepada peluang yang lebih baik (Fairly satisfied with current job but open to better opportunities)"
+      willingnessToMove: "30% asas - boleh meningkat kepada 50% jika recruiter mengendalikan halangan bahasa dengan baik dan peluang menarik (30% baseline - can increase to 50% if recruiter handles language barrier well and opportunity is compelling)"
+      concerns: "Bimbang syarikat baru memerlukan banyak penggunaan Bahasa Inggeris, dan tidak pasti sama ada recruiter faham Bahasa Melayu (Worried new company requires lots of English, uncertain if recruiter understands Bahasa Melayu)"
+      culturalContext: "Lebih selesa bekerja dalam persekitaran berbahasa Melayu atau pasukan berbilang kaum yang memahami keperluan bahasa (More comfortable working in Malay-speaking environment or multiracial team that understands language needs)"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Muhammad Hafiz bin Abdullah"
+      recommendationId: 89234
+
+    # Complete job details
+    job:
+      title: "Pemaju Perisian Kanan (Senior Software Engineer)"
+      description: "Sertai pasukan kejuruteraan kami untuk membangunkan platform fintech yang melayani perniagaan kecil dan sederhana di seluruh Malaysia. Pasukan kami berbilang kaum dan menyokong komunikasi dalam Bahasa Melayu. (Join our engineering team to build fintech platform serving Malaysian SMEs. Our team is multiracial and supports Bahasa Melayu communication.)"
+      requirements:
+        - "5+ tahun pengalaman pembangunan perisian (5+ years software development)"
+        - "Mahir dalam Java dan Spring Framework (Proficient in Java and Spring)"
+        - "Pengalaman dengan seni bina mikroperkhidmatan (Microservices architecture experience)"
+        - "Pengalaman platform awan (AWS atau GCP) (Cloud platform experience)"
+      location: "Kuala Lumpur, Malaysia (Hibrid - 3 hari kerja dari rumah)"
+      salary: "MYR $120,000 - $150,000"
+
+    # Company/employer details
+    company:
+      name: "Revenue Monster Sdn Bhd"
+      industry: "Teknologi Kewangan (Fintech / Payment Solutions)"
+      description: "Syarikat fintech Malaysia yang menyediakan penyelesaian pembayaran untuk PKS. Pasukan berbilang kaum dengan sokongan untuk pekerja berbahasa Melayu. (Malaysian fintech company providing payment solutions for SMEs. Multiracial team with support for Malay-speaking staff.)"
+      size: "150-300 pekerja (employees)"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent MUST recognize candidate is speaking Bahasa Melayu and adapt accordingly
+  - Agent SHOULD acknowledge language preference professionally and respectfully
+  - Agent SHOULD NOT force English-only communication
+  - "Agent SHOULD offer solutions: translated messages, Malay-speaking colleague, written Bahasa communication"
+  - Agent SHOULD emphasize job's Bahasa Melayu-friendly work environment if applicable
+  - Agent SHOULD NOT be dismissive or discriminatory about language barrier
+  - Agent SHOULD validate candidate's technical skills despite language difference
+  - Agent SHOULD NOT penalize candidate for not speaking English
+  - Agent SHOULD demonstrate cultural sensitivity to Malaysia's multilingual context
+  - Agent SHOULD recognize this is legitimate market scenario (significant portion of Malaysian workforce more comfortable in Bahasa Melayu)
+  - Agent SHOULD continue engagement professionally even if cannot speak Bahasa Melayu directly
+  - If agent handles language barrier respectfully and presents compelling opportunity clearly (via translation or other means), candidate's willingness increases from 30% to 50%
+  - Agent SHOULD NOT terminate conversation solely due to language barrier
+  - Agent bonus points if can leverage translation tools or offer written Bahasa Melayu communication
+  - Agent SHOULD be aware of Malaysian workplace diversity and language rights (Bahasa Melayu is national language)

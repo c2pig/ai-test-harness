@@ -1,0 +1,59 @@
+schemaVersion: "1.0.0"
+
+project:
+  name: product-listing
+  description: Quality assessment for Smart Hire candidate profile generation
+
+testPlan:
+  type: text-generation
+  batchSize: 1
+
+  # Reference prompt from shared models configuration (1-liner)
+  prompt: product-listing
+
+  # Data connectors
+  connectors:
+    logs: 60-day-logs-query
+
+  # LLM configuration for text generation
+  llmConfig:
+    # Using Claude 3.5 Sonnet - supports on-demand invocation in ap-southeast-2
+    modelId: bedrock:anthropic.claude-3-5-sonnet-20241022-v2:0
+    temperature: 0.5
+    topP: 1.0
+    maxTokens: 4000
+evaluationPlan:
+  judgeModel:
+    # Using US cross-region inference profile - LLMJudge uses us-east-1
+    modelId: bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0
+    temperature: 0
+    topP: 1.0
+    maxTokens: 4000
+
+  qualityAssessment:
+    attributes:
+      - ZeroHallucination                         # core framework attribute
+      - custom/quality/PIIRemoval                 # custom AI-Test-Harness attribute
+      - custom/quality/AuthenticContent           
+      - custom/quality/XMLFormatCompliance        
+      - custom/quality/ChronologicalOrder         
+      - custom/quality/SourcePriority             
+      - custom/quality/SourceTagging              
+      - custom/quality/MarkdownFormatting         
+
+    # Solution description for judge evaluation
+    solutionDescription: "AI-generated candidate profile for job matching"
+
+    # Load calibration from external file (optional)
+    calibrationPath: "./evaluation/calibration.yaml"
+
+# ============================================
+# VALIDATORS
+# ============================================
+validators:
+  cost:
+    lt: 0.05  # Max cost per test (text-generation only)
+    gt: 0.04  # Warning threshold
+  latencyMs:
+    lt: 5000  # Max 5 seconds
+    gt: 4000  # Warning at 4 seconds

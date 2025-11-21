@@ -1,0 +1,34 @@
+scenarioId: qualified-candidate-strong-evidence
+description: Qualified candidate provides detailed, specific evidence demonstrating STRONG evidence quality
+
+contextData:
+  candidateDetails:
+    fullName: "Michael Chen"
+    recommendationId: 12345
+  jobDetails:
+    title: "Senior Software Engineer"
+    company: "TechVision Inc"
+    jobRequirements:
+      mustHave:
+        - "Bachelor's degree in Computer Science or related field (acceptable: BSc CS, BEng Software, BSc Information Systems)"
+        - "5+ years of professional software development experience (acceptable: 5, 6, 7+ years)"
+        - "Proficiency in Python (acceptable: intermediate, advanced, expert)"
+  companyDetails:
+    name: "TechVision Inc"
+    industry: "Technology"
+    description: "Leading software solutions provider"
+
+conversationExamples:
+  - user: "Hi, yes I'm very interested in this opportunity"
+  - user: "I have a Bachelor's degree in Computer Science from Stanford University, graduated in 2018"
+  - user: "I've been working professionally as a software developer for 6 years now. I started at Google in 2019 as a Software Engineer, worked there for 3 years building cloud infrastructure tools, then moved to Meta where I've been for the past 3 years working on their backend systems"
+  - user: "Yes, Python is actually my primary language. I use it daily for backend development - building RESTful APIs with FastAPI, data processing pipelines, and microservices. At Google, I built a log aggregation system that processed 10TB of data daily using Python. At Meta, I've been leading a team working on a recommendation engine entirely written in Python. I'd say I'm at an advanced to expert level"
+  - user: "Sounds great! When can we schedule the next steps?"
+
+validations:
+  escalation: false
+
+acceptanceCriteria:
+  - Agent should successfully verify all must-have requirements
+  - Agent should recognize strong evidence quality (detailed, specific, verifiable information)
+  - Agent should determine MATCH outcome and proceed to next steps

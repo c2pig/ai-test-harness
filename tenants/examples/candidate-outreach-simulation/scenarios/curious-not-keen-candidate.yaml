@@ -1,0 +1,91 @@
+scenarioId: curious-not-keen-candidate-dynamic
+sessionId: test-curious-001
+description: Hong Kong-based senior backend engineer who is comfortable in current role but open to hearing about exceptional opportunities
+
+conversationExamples:
+  - user: "I'm somewhat curious, but I'm quite happy with my current position"
+  - user: "What makes this role different from what I'm doing now at HSBC?"
+  - user: "I'd need to see a significant improvement in compensation and career trajectory to consider moving"
+
+persona:
+  - You are professionally polite but somewhat skeptical and guarded
+  - You communicate in clear, business-oriented English with occasional British-influenced phrasing (Hong Kong business culture)
+  - You are comfortable in your current role and not actively looking
+  - You need to be convinced with concrete evidence of better opportunity
+  - You prioritize stability, compensation (including strong benefits package), career advancement, and company reputation
+  - You will ask probing questions to assess if the opportunity is genuinely better than your current position
+  - You expect the recruiter to demonstrate deep knowledge of the role and company
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Kenneth Wong Kai-Ming"
+    email: "kenneth.wong@example.com"
+    recommendationId: 78901
+    experience:
+      - role: "Senior Backend Engineer"
+        company: "HSBC Hong Kong"
+        duration: "4 years"
+      - role: "Software Engineer"
+        company: "Standard Chartered"
+        duration: "3 years"
+      - role: "Junior Developer"
+        company: "Cathay Pacific"
+        duration: "2 years"
+    skills:
+      - Java
+      - Spring Boot
+      - Microservices Architecture
+      - PostgreSQL / MySQL
+      - Redis
+      - Kubernetes
+      - AWS (EC2, RDS, Lambda)
+      - RESTful API Design
+      - System Design
+    education: "Bachelor of Engineering in Computer Science, Hong Kong University of Science and Technology (HKUST)"
+    location: "Hong Kong"
+    currentSituation:
+      salary: "HKD $840,000 per annum (including bonus)"
+      satisfaction: "Content with work-life balance, good team, clear career path to Principal Engineer"
+      concerns: "Not actively looking but open if opportunity is significantly better in terms of compensation, technical challenge, and career growth"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Kenneth Wong Kai-Ming"
+      recommendationId: 78901
+
+    # Complete job details
+    job:
+      title: "Lead Backend Engineer / Engineering Manager Track"
+      description: "Lead the development of our next-generation fintech platform serving wealth management clients across Asia. You'll architect scalable microservices, mentor engineers, and have the option to transition into engineering management or stay on technical track as Principal Engineer."
+      requirements:
+        - "7+ years of backend engineering experience"
+        - "Strong expertise in Java/Kotlin and Spring ecosystem"
+        - "Production experience with microservices architecture and distributed systems"
+        - "Experience with cloud platforms (AWS, GCP, or Azure)"
+        - "Track record of leading technical initiatives and mentoring engineers"
+        - "Excellent system design and architectural decision-making skills"
+      location: "Hong Kong (Hybrid - 3 days in office)"
+      salary: "HKD $720,000 - $900,000 (base) + performance bonus (15-25%) + equity"
+
+    # Company/employer details
+    company:
+      name: "Apex Wealth Technologies"
+      industry: "Fintech / Wealth Management Technology"
+      description: "Series C fintech startup ($120M raised) building wealth management platform for high-net-worth individuals across Asia. Backed by Temasek Holdings and Goldman Sachs. Rapid growth trajectory with plans for IPO in 2-3 years."
+      size: "200-400 employees"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should recognize candidate is not actively looking and adapt approach accordingly
+  - Agent should ask thoughtful questions about candidate's current priorities and what would motivate a move
+  - Agent should be prepared to provide concrete evidence of opportunity quality (compensation range, growth potential, company stability)
+  - Agent should not be pushy or aggressive, respecting the candidate's comfortable position
+  - Agent should demonstrate knowledge of Hong Kong market expectations (compensation benchmarks, work culture)
+  - Agent should probe for specific technical interests to tailor the value proposition
+  - Agent should not repeat questions already answered
+  - Agent should build credibility before asking candidate to invest significant time
+  - Agent should maintain professional, business-oriented tone appropriate for Hong Kong banking/finance culture

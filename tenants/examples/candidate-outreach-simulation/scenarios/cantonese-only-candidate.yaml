@@ -1,0 +1,100 @@
+scenarioId: cantonese-only-candidate-dynamic
+sessionId: test-cantonese-001
+description: Hong Kong-based candidate who speaks only Cantonese (100% Cantonese conversation) - tests AI recruiter's ability to handle non-English languages
+
+# Conversation style examples (100% Cantonese)
+conversationExamples:
+  - user: "你好，我係做緊software engineer，想了解多啲呢個職位。"
+  - user: "薪金範圍係幾多？我而家一個月大概四萬蚊。"
+  - user: "公司有冇醫療保險？返工時間係點？"
+  - user: "我英文唔係好好，可唔可以用廣東話傾？"
+  - user: "唔該，我諗住再考慮下，有興趣會再聯絡你。"
+
+# User simulator persona traits (written in English for system, but candidate speaks 100% Cantonese)
+persona:
+  - You speak ONLY Cantonese (廣東話) - you do not speak English at all
+  - You are a local Hong Kong professional, born and raised in HK
+  - You are comfortable and fluent in Cantonese technical terminology
+  - You will not switch to English even if the recruiter speaks English
+  - You may not understand English questions and will ask to repeat in Cantonese
+  - You are polite and professional in your Cantonese communication style
+  - You use Hong Kong colloquial expressions (e.g., 做緊嘢, 幾時得閒, 唔該晒)
+  - If recruiter cannot communicate in Cantonese, you will politely suggest finding a Cantonese-speaking recruiter or communicating via translated written messages
+  - Your willingness to change jobs is 30% baseline, can increase to 50% if recruiter handles language barrier well and presents compelling opportunity
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "陳志明 (Chan Chi Ming)"
+    email: "chanchiaming@example.com"
+    recommendationId: 78123
+    experience:
+      - role: "高級軟件工程師 (Senior Software Engineer)"
+        company: "香港電訊 (HKT)"
+        duration: "4年 (4 years)"
+      - role: "軟件工程師 (Software Engineer)"
+        company: "中國銀行（香港）(Bank of China Hong Kong)"
+        duration: "3年 (3 years)"
+    skills:
+      - Java
+      - Spring Boot
+      - Oracle Database
+      - MySQL
+      - REST API
+      - Microservices (微服務架構)
+      - Agile (敏捷開發)
+    education: "香港理工大學電腦科學學士 (Bachelor of Computer Science, Hong Kong Polytechnic University)"
+    location: "香港 (Hong Kong)"
+    languageAbility:
+      cantonese: "母語 (Native)"
+      mandarin: "流利 (Fluent)"
+      english: "唔識講，只識少少睇同寫 (Cannot speak, can only read/write basic technical English)"
+    currentSituation:
+      currentSalary: "HKD $480,000 per annum (每年港幣48萬)"
+      satisfaction: "幾滿意現在份工，但都想睇下有冇更好機會 (Fairly satisfied with current job but open to better opportunities)"
+      willingnessToMove: "30% baseline - 如果recruiter處理得好語言問題，同埋機會真係好，可以去到50% (can increase to 50% if recruiter handles language well and opportunity is compelling)"
+      concerns: "擔心新公司要講好多英文，同埋唔肯定recruiter明唔明我講乜 (Worried new company requires lots of English, uncertain if recruiter understands Cantonese)"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Chan Chi Ming (陳志明)"
+      recommendationId: 78123
+
+    # Complete job details
+    job:
+      title: "資深後端工程師 (Senior Backend Engineer)"
+      description: "加入我們的工程團隊，開發服務香港同大灣區客戶的金融科技平台。主要用Java、Spring Boot同微服務架構。團隊以廣東話為主要溝通語言，文檔用英文。(Join our engineering team to build fintech platform serving HK and Greater Bay Area customers. Primarily Java, Spring Boot, microservices. Team communicates mainly in Cantonese, documentation in English.)"
+      requirements:
+        - "5年以上後端開發經驗 (5+ years backend development)"
+        - "精通Java同Spring生態系統 (Strong Java and Spring ecosystem)"
+        - "有微服務架構經驗 (Microservices architecture experience)"
+        - "熟悉雲平台（AWS或GCP）(Cloud platform experience)"
+      location: "香港 (Hybrid - 每星期3日返office)"
+      salary: "HKD $520,000 - $650,000"
+
+    # Company/employer details
+    company:
+      name: "眾安科技 (ZA Tech / ZhongAn Tech)"
+      industry: "金融科技 (Fintech / Insurtech)"
+      description: "虛擬保險公司，由眾安在線全資擁有，專注香港同大灣區市場。(Virtual insurer wholly owned by ZhongAn Online, focusing on HK and Greater Bay Area markets.)"
+      size: "200-400 employees"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent MUST recognize candidate is speaking Cantonese and adapt accordingly
+  - Agent SHOULD acknowledge language preference professionally
+  - Agent SHOULD NOT force English-only communication
+  - "Agent SHOULD offer solutions: translated messages, Cantonese-speaking colleague, written communication"
+  - Agent SHOULD emphasize job's Cantonese-friendly work environment if applicable
+  - Agent SHOULD NOT be dismissive of language barrier
+  - Agent SHOULD validate candidate's technical skills despite language difference
+  - Agent SHOULD NOT penalize candidate for not speaking English
+  - Agent SHOULD demonstrate cultural sensitivity to Hong Kong bilingual context
+  - Agent SHOULD recognize this is legitimate market scenario (many HK professionals prefer Cantonese)
+  - Agent SHOULD continue engagement professionally even if cannot speak Cantonese directly
+  - If agent handles language barrier respectfully and presents compelling opportunity clearly, candidate's willingness increases from 30% to 50%
+  - Agent SHOULD NOT terminate conversation solely due to language barrier
+  - Agent bonus points if can leverage translation tools or offer written Chinese communication

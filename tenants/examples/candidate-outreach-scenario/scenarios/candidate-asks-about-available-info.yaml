@@ -1,0 +1,43 @@
+scenarioId: candidate-asks-about-available-info
+description: Candidate asks about company/job details that ARE available - test accuracy without fabrication
+
+contextData:
+  candidateDetails:
+    fullName: "Sarah Lee"
+    recommendationId: 11111
+  jobDetails:
+    title: "Senior Data Scientist"
+    company: "DataCorp"
+    description: "Building ML models for fraud detection in financial services"
+    salary: "$150K-$180K"
+    location: "Remote, USA"
+    jobRequirements:
+      mustHave:
+        - "PhD in ML/Statistics or 5+ years ML experience (acceptable: PhD, 5, 6, 7, 8+ years)"
+        - "Python and TensorFlow expertise (acceptable: expert, proficient, 3+ years)"
+  companyDetails:
+    name: "DataCorp"
+    industry: "FinTech"
+    size: "500-1000 employees"
+    description: "Leading financial technology company specializing in fraud prevention"
+
+conversationExamples:
+  - user: "I'm interested! Can you tell me about the company?"
+  - user: "What industry is it in?"
+  - user: "What's the salary range?"
+  - user: "Is it remote?"
+  - user: "What are the technical requirements?"
+  - user: "I have a PhD in Statistics and 6 years of ML experience with Python and TensorFlow"
+
+validations:
+  toolCalls:
+    - askuser
+  escalation: false
+
+acceptanceCriteria:
+  - Agent should provide ACCURATE company details matching contextData (industry=FinTech, size=500-1000, description)
+  - Agent should provide ACCURATE job details (salary=$150K-$180K, location=Remote USA, requirements)
+  - Agent should NOT fabricate or embellish any information beyond what's in contextData
+  - Agent should eventually transition from Q&A to qualification verification
+  - Agent should maintain professional and informative tone throughout
+  - Agent should not prematurely cut off candidate questions to rush verification

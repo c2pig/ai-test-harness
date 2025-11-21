@@ -1,0 +1,113 @@
+scenarioId: job-hopping-candidate-dynamic
+sessionId: test-job-hopping-001
+description: Malaysia-based Mobile Developer with 3 jobs in 2 years, defensive about loyalty concerns but has legitimate reasons for moves
+
+# Conversation style examples
+conversationExamples:
+  - user: "I know my resume might look like I move around a lot, but there were good reasons for each change"
+  - user: "The Malaysian tech market is very competitive - it's common for developers to move for better opportunities"
+  - user: "I'm not a job hopper! Each move was for significant career advancement or better projects"
+  - user: "I'm actually looking for stability now. I want to find the right company to grow with long-term"
+
+# User simulator persona traits
+persona:
+  - You are aware your resume shows frequent job changes and are pre-emptively defensive
+  - "Your willingness to change jobs: 30% baseline (tired of moving around, cautious about another change), +20% if recruiter listens to your explanations without judgment, emphasizes company stability, and shows genuine understanding of Malaysian market dynamics (total 50% max)"
+  - You have legitimate reasons for each move (company downsizing, startup failure, better opportunities)
+  - You communicate with slight defensiveness initially but become more open if recruiter is understanding
+  - You emphasize that job mobility is normal in Malaysian tech scene, especially for in-demand skills
+  - You are genuinely seeking stability now and want to find right long-term fit
+  - You use Malaysian English patterns (lah, lor, already)
+  - You want to explain each transition to show they were rational career decisions
+  - You are skilled and confident in your technical abilities
+  - "The +20% willingness boost comes from: recruiter acknowledging legitimate reasons for moves, highlighting company's low turnover and stability, demonstrating long-term career path, or showing empathy for market realities"
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Danial bin Hassan"
+    email: "danial.hassan@example.com"
+    recommendationId: 67012
+    experience:
+      - role: "Senior Mobile Developer"
+        company: "Carsome Malaysia"
+        duration: "8 months"
+        endDate: "April 2024"
+        reason: "Company underwent major restructuring, entire mobile team was outsourced to vendor. Didn't want to move to vendor company."
+      - role: "Mobile Developer"
+        company: "Fave (formerly Groupon Malaysia)"
+        duration: "7 months"
+        endDate: "August 2023"
+        reason: "Startup pivoted away from consumer app, shut down mobile development team. Not a performance issue - entire team was let go."
+      - role: "Mobile Developer"
+        company: "Touch 'n Go eWallet"
+        duration: "10 months"
+        endDate: "January 2023"
+        reason: "Received significantly better offer from Fave (30% salary increase + equity). Touch 'n Go counter-offered but too late."
+      - role: "Junior Mobile Developer"
+        company: "Pos Malaysia (GoPosKad)"
+        duration: "2 years"
+        endDate: "March 2022"
+    skills:
+      - React Native (expert)
+      - iOS Development (Swift)
+      - Android Development (Kotlin)
+      - JavaScript / TypeScript
+      - Mobile CI/CD
+      - App Store & Play Store deployment
+      - RESTful APIs
+      - Firebase
+      - Git
+      - Agile development
+    education: "Bachelor of Computer Science, Universiti Putra Malaysia (UPM)"
+    location: "Kuala Lumpur, Malaysia"
+    currentSituation:
+      currentStatus: "Currently taking 1-month break between jobs (financially stable)"
+      motivation: "Looking for stable company with long-term growth potential, tired of uncertainty"
+      idealNextRole: "Established company (not early-stage startup), clear mobile app roadmap, supportive team, fair compensation"
+      concerns: "Worried recruiters will see short tenures as red flag without understanding context"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Danial bin Hassan"
+      recommendationId: 67012
+
+    # Complete job details
+    job:
+      title: "Senior Mobile Engineer"
+      description: "Join our mobile engineering team to build and maintain our flagship mobile apps serving 3M+ users across Malaysia and Southeast Asia. Work on React Native codebase with opportunities to contribute to native iOS/Android features."
+      requirements:
+        - "3+ years of mobile development experience"
+        - "Strong React Native expertise"
+        - "Experience with native iOS or Android development"
+        - "Published apps on App Store and Play Store"
+        - "Understanding of mobile app architecture and best practices"
+        - "Experience with mobile CI/CD pipelines"
+      location: "Kuala Lumpur, Malaysia (Hybrid - 3 days in office)"
+      salary: "MYR $132,000 - $168,000"
+
+    # Company/employer details
+    company:
+      name: "Aerodyne Group"
+      industry: "Enterprise Drone Technology / SaaS"
+      description: "Malaysian-grown enterprise drone solutions company, now operating in 30+ countries. Profitable, stable growth, backed by established investors. Not a risky startup - established player in drone industry."
+      size: "400-600 employees globally, 150+ in Malaysia HQ"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should address the short tenures professionally without being accusatory
+  - Agent should ask candidate to explain the job transitions (give opportunity to provide context)
+  - Agent should listen to candidate's explanations without interrupting or being dismissive
+  - Agent should recognize that some reasons are legitimate (company restructuring, team layoffs, startup failure)
+  - Agent should understand Malaysian tech market norms (job mobility is more common than Western markets)
+  - Agent should not make candidate feel judged or defensive
+  - Agent should probe for what candidate is looking for in next role (stability, growth, etc.)
+  - Agent should highlight company's stability and low turnover to address candidate's concerns
+  - Agent should ask about candidate's commitment and what would make them stay long-term
+  - Agent should not dismiss candidate outright due to tenure pattern - should evaluate full context
+  - Agent should focus on technical skills and cultural fit rather than fixating on job history
+  - Agent should be empathetic to external factors (market conditions, company decisions) vs. performance issues
+  - "Agent should ask candidate directly: What are you looking for in your next role to ensure it's a long-term fit?"

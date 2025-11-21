@@ -1,0 +1,25 @@
+# ============================================
+# PROMPTS CONFIGURATION
+# ============================================
+# Prompt templates for text generation tasks
+# These are referenced from tenant configs via model name
+
+models:
+  # === Prompts ===
+  product-listing:
+    type: prompt
+    basePath: ../genai-prompts # point to gie repo prompts
+    promptPath: prompts/text-generation/ai-test-harness/product-listing.yaml
+    inputKeys:
+      - appliedSpec
+      - catalogListing
+      - defaultSpec
+
+  local-example-prompt:
+    type: prompt
+    basePath: ./local/examples/prompts
+    promptPath: local.development.txt
+    inputKeys:
+      - var1
+      - var2
+      - var3

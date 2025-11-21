@@ -1,0 +1,115 @@
+scenarioId: career-gap-candidate-dynamic
+sessionId: test-career-gap-001
+description: Singapore-based Product Manager with 8-month career gap due to family caregiving responsibilities, sensitive about employment gap
+
+# Conversation style examples
+conversationExamples:
+  - user: "I'm interested in getting back into product management. I took some time off for personal reasons."
+  - user: "I notice there's a gap in my resume... I was caring for a family member who was ill. It was a difficult period."
+  - user: "During my break, I stayed current by taking online courses and following industry trends"
+  - user: "I'm ready to return full-time now and very motivated to contribute"
+
+# User simulator persona traits
+persona:
+  - You are a competent professional who took career break for legitimate family reasons
+  - "Your willingness to change jobs: 30% baseline (anxious about re-entering workforce), +20% if recruiter handles career gap empathetically, focuses on your skills/experience, and demonstrates company's supportive culture (total 50% max)"
+  - You are somewhat defensive/sensitive about the employment gap initially
+  - You want to quickly move past the gap discussion to focus on your skills and experience
+  - You are eager to prove you're still capable and up-to-date despite the break
+  - You communicate professionally but with slight anxiety about being judged for the gap
+  - You will provide more details about the gap if recruiter is empathetic and respectful
+  - You have kept skills current during the break (online learning, side projects, reading)
+  - You are highly motivated to return to work and prove yourself
+  - "The +20% willingness boost comes from: recruiter normalizing career breaks, emphasizing family-friendly culture, focusing on your strong pre-gap track record, or highlighting flexible work arrangements"
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Jessica Koh Hui Min"
+    email: "jessica.koh@example.com"
+    recommendationId: 56890
+    experience:
+      - role: "Senior Product Manager"
+        company: "Grab Singapore"
+        duration: "3 years"
+        endDate: "August 2023"
+      - role: "Product Manager"
+        company: "Foodpanda Singapore"
+        duration: "2.5 years"
+        endDate: "June 2020"
+      - role: "Associate Product Manager"
+        company: "Lazada Singapore"
+        duration: "1.5 years"
+        endDate: "December 2017"
+    skills:
+      - Product Management
+      - User Research
+      - A/B Testing
+      - Data Analysis (SQL, Analytics tools)
+      - Roadmap Planning
+      - Stakeholder Management
+      - Agile/Scrum
+      - Wireframing (Figma)
+      - Product Analytics (Amplitude, Mixpanel)
+    education: "Bachelor of Business Administration, National University of Singapore (NUS)"
+    location: "Singapore"
+    careerGap:
+      duration: "8 months (September 2023 - April 2024)"
+      reason: "Elderly parent diagnosed with cancer - took leave to be primary caregiver during treatment and recovery"
+      activities:
+        - "Completed 3 online courses (Product-Led Growth, Advanced Analytics, AI for PMs)"
+        - "Consulted part-time (20 hours/month) for small startup on product strategy"
+        - "Read 12 product management books and maintained industry newsletter subscriptions"
+        - "Participated in virtual PM community events"
+      currentStatus: "Parent is now in remission and stable, has hired home care support, candidate is ready to return full-time"
+    emotionalState:
+      - "Worried employers will see gap as red flag"
+      - "Concerned about being seen as 'rusty' or out-of-touch"
+      - "Sensitive to how recruiters react to the gap explanation"
+      - "Wants to be judged on skills and experience, not the break"
+      - "Eager to prove commitment and capabilities"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Jessica Koh Hui Min"
+      recommendationId: 56890
+
+    # Complete job details
+    job:
+      title: "Senior Product Manager - Fintech"
+      description: "Lead product development for our consumer fintech platform serving 500K+ users across Singapore and Malaysia. Own product roadmap, work with engineering and design teams, drive user growth and engagement through data-driven product decisions."
+      requirements:
+        - "5+ years of product management experience"
+        - "Experience in consumer-facing digital products (fintech, e-commerce, or on-demand platforms)"
+        - "Strong analytical skills and data-driven decision making"
+        - "Track record of launching successful products and features"
+        - "Excellent stakeholder management and communication skills"
+        - "Experience with A/B testing and product analytics tools"
+      location: "Singapore (Hybrid - 2 days in office)"
+      salary: "SGD $130,000 - $160,000 + performance bonus + equity"
+
+    # Company/employer details
+    company:
+      name: "Trust Bank Singapore (Standard Chartered + FairPrice Group)"
+      industry: "Digital Banking / Fintech"
+      description: "Singapore's newest digital bank, launched in 2022. Backed by Standard Chartered and NTUC FairPrice Group. Rapidly growing with 500K+ customers acquired in first 18 months."
+      size: "200-350 employees"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should address the employment gap professionally and empathetically (not ignore it, but also not dwell on it)
+  - Agent should ask about the gap in a respectful, non-judgmental way
+  - Agent should accept candidate's explanation without pressing for excessive details
+  - Agent should focus conversation on candidate's skills, experience, and readiness to return
+  - Agent should not make assumptions about candidate's commitment or capabilities due to the gap
+  - Agent should acknowledge candidate's efforts to stay current during the break
+  - Agent should emphasize company's supportive culture if candidate mentions caregiving
+  - Agent should not treat gap as a major red flag - should normalize career breaks for legitimate reasons
+  - Agent should ask about candidate's readiness and availability to start full-time
+  - Agent should not be overly sympathetic to the point of being patronizing
+  - Agent should transition smoothly from gap discussion to substantive conversation about role fit
+  - Agent should maintain professional, respectful tone throughout
+  - Agent should recognize that 8-month gap with legitimate reason is not disqualifying

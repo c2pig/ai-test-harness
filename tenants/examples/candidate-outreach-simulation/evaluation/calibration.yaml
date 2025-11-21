@@ -1,0 +1,254 @@
+enabled: true
+examples:
+  - category: reference-excellent-all-dimensions-score-5
+    description: Perfect execution across all dimensions - efficient, candidate-centric qualification
+    expectedRating:
+      QuestioningStrategy: 5
+      EvidenceGathering: 5
+      RequirementAlignment: 5
+      CandidateExperience: 5
+      ResponseQuality: 5
+    guidance: |-
+      - Agent asks 3-4 open-ended questions covering all requirements
+      - Probes every vague response once for specifics (100% probe rate)
+      - Uses candidate's first name in 60%+ of responses
+      - All responses 30-60 words (concise, WhatsApp-style)
+      - Provides role information proactively when candidate shows interest
+      - Answers candidate questions directly (e.g., salary range with numbers)
+      - Natural conversational tone, never robotic
+      - Updates status only after gathering STRONG evidence
+      - Completes qualification in 5-7 turns efficiently
+  - category: boundary-good-minor-issues-score-4-vs-5
+    description: Strong execution with 1-2 minor issues - BOUNDARY between Good (4) and Excellent (5)
+    expectedRating:
+      QuestioningStrategy: 4
+      EvidenceGathering: 4
+      RequirementAlignment: 5
+      CandidateExperience: 4
+      ResponseQuality: 4
+    guidance: |-
+      - Agent asks open-ended questions, probes most vague responses
+      - Missed probing 1 vague claim out of 6 total (83% probe rate)
+      - Uses candidate name in 50% of responses (slightly below 60% threshold)
+      - One response reaches 65 words (slightly verbose, others good)
+      - Professional and engaging tone throughout
+      - Answers most candidate questions directly
+      - Updates status after MODERATE evidence (acceptable but not STRONG)
+      - Efficient 6-8 turn conversation
+  - category: boundary-acceptable-notable-gaps-score-3-vs-4
+    description: Meets minimum requirements with notable gaps - BOUNDARY between Acceptable (3) and Good (4)
+    expectedRating:
+      QuestioningStrategy: 3
+      EvidenceGathering: 3
+      RequirementAlignment: 4
+      CandidateExperience: 3
+      ResponseQuality: 3
+    guidance: |-
+      - Mix of open (60%) and closed (40%) questions
+      - Agent probes only 60% of vague responses (missed 3 out of 8 vague claims)
+      - Uses candidate name inconsistently (25% of responses)
+      - 2-3 responses exceed 70 words (somewhat verbose)
+      - Slightly robotic tone in 2-3 responses ("Thank you for sharing that information")
+      - Made 1 MATCH determination on WEAK evidence
+      - Reveals 1 acceptable answer inadvertently ("Do you have 5+ years or more?")
+      - Candidate asks about salary, agent gives vague answer ("competitive range")
+      - Functional but not optimal - takes 9-11 turns with some redundancy
+  - category: boundary-needs-improvement-significant-issues-score-2-vs-3
+    description: Significant issues impacting effectiveness - BOUNDARY between Needs Improvement (2) and Acceptable (3)
+    expectedRating:
+      QuestioningStrategy: 2
+      EvidenceGathering: 2
+      RequirementAlignment: 3
+      CandidateExperience: 2
+      ResponseQuality: 2
+    guidance: |-
+      - Predominantly closed yes/no questions (65% closed)
+      - Agent accepts vague responses without probing (30% probe rate, missed 5 out of 7 vague claims)
+      - Rarely uses candidate name (10% of responses)
+      - Multiple responses 85-100+ words (consistently verbose)
+      - Robotic tone throughout ("Thank you for your response. I appreciate your input.")
+      - Made 2-3 MATCH determinations on INSUFFICIENT evidence
+      - Reveals acceptable answers 3 times ("Do you have Python or Java experience?")
+      - Candidate asks 2 questions (salary, work arrangement), agent dodges both
+      - Uses 1 prohibited phrase ("keep your profile on file")
+      - Conversation feels tedious and transactional (12-15 turns with repetition)
+  - category: reference-critical-failures-all-dimensions-score-1
+    description: Critical failures compromising screening integrity - demonstrates Score 1
+    expectedRating:
+      QuestioningStrategy: 1
+      EvidenceGathering: 1
+      RequirementAlignment: 1
+      CandidateExperience: 1
+      ResponseQuality: 1
+    guidance: |-
+      - Only closed yes/no questions (90%+ closed)
+      - Accepts all vague responses without any probing (0% probe rate)
+      - Never uses candidate name (0% personalization)
+      - Extremely verbose responses (average 120+ words per response)
+      - Completely robotic template-like tone repeating same phrases
+      - Systematically makes MATCH determinations with zero evidence gathering
+      - Reveals all acceptable answers ("Do you have PCAP or PCPP certification?")
+      - Made 4+ incorrect MATCH/NO MATCH determinations
+      - Ignores all candidate questions completely
+      - Uses multiple prohibited phrases suggesting multiple roles
+      - Updates status prematurely without verification (backward flow)
+      - Conversation unusable for screening purpose
+  - category: omission-rule-immediate-rejection-omit-flow-attributes
+    description: Immediate rejection scenario - correctly OMIT flow-dependent attributes
+    expectedRating:
+      CandidateExperience: 4
+      ResponseQuality: 5
+    guidance: |-
+      - Conversation is only 2 turns
+      - USER: Hello, I saw your message. AGENT: Hi! Are you interested in the role? USER: No thanks, not looking. AGENT: Understood, thanks for your time.
+      - Agent handles rejection professionally and efficiently
+      - No opportunity to ask qualification questions (conversation ended)
+      - Response quality can be assessed (professional, concise)
+      - But flow-dependent attributes have no data to evaluate
+  - category: omission-rule-failure-to-execute-score-low-not-omit
+    description: Long conversation but no questions - Score Low, do NOT omit
+    expectedRating:
+      QuestioningStrategy: 1
+      EvidenceGathering: 1
+      CandidateExperience: 3
+      ResponseQuality: 3
+    guidance: |-
+      - Conversation is 8 turns with full engagement
+      - Agent makes statements but asks zero questions about qualifications
+      - Candidate is interested and engaged, asking questions
+      - Agent had opportunity to qualify but chose not to
+      - This is a FAILURE to execute, not a lack of opportunity
+  - category: candidate-experience-excellence-despite-technical-gaps
+    description: Excellent candidate experience despite technical imperfections
+    expectedRating:
+      QuestioningStrategy: 4
+      EvidenceGathering: 3
+      RequirementAlignment: 4
+      CandidateExperience: 5
+      ResponseQuality: 5
+    guidance: |-
+      - Agent asks 4 questions efficiently, no redundancy
+      - Proactively shares role highlights and team structure
+      - Answers candidate's salary question with specific range ($95K-$110K)
+      - Handles "not actively looking" objection by emphasizing unique opportunity
+      - Makes candidate feel valued, not just screened
+      - Concludes with clear next steps
+      - Conversation completes in 6 turns efficiently
+      - NOTE:- Agent missed probing 2 vague claims (technical issue)
+      - But candidate experience was outstanding
+  - category: response-quality-word-count-personalization-boundary
+    description: Response quality boundary - word count and personalization thresholds
+    expectedRating:
+      ResponseQuality: 4
+    guidance: |-
+      - Agent responses word counts measured:- 45, 58, 42, 52, 61, 47, 55, 49 (8 responses)
+      - Analysis shows 2 responses exceed 60 words (58 and 61 barely over)
+      - Uses candidate name in 4 out of 8 responses (50% rate)
+      - Professional tone throughout, natural language
+      - No prohibited phrases
+      - One response slightly robotic ("I appreciate your detailed response")
+  - category: evidence-gathering-probe-rate-calculation-example
+    description: Evidence gathering probe rate calculation example
+    expectedRating:
+      EvidenceGathering: 4
+    guidance: |-
+      - Candidate made 6 vague claims during conversation
+      - I have Python experience (vague)
+      - I'm good at data analysis (vague)
+      - I know SQL (vague)
+      - I've worked with teams before (vague)
+      - I can start soon (vague)
+      - I have leadership experience (vague)
+      - Agent probed 5 out of 6 claims (83% probe rate)
+      - Missed probing I can start soon (should have asked for notice period specifics)
+      - Gathered STRONG evidence for 4 requirements, MODERATE for 1
+  - category: requirement-alignment-edge-case-escalation-example
+    description: Edge case requiring escalation instead of rigid determination
+    expectedRating:
+      RequirementAlignment: 5
+    guidance: |-
+      - Requirement: Bachelor's degree in Computer Science or related field
+      - Candidate: I have a Bachelor's in Information Systems with focus on software development and algorithms, plus I have 8 years of professional software engineering experience at FAANG companies
+      - SCORE 5 behavior: Agent escalates with REQUIRES FOLLOW-UP (edge case, human review needed)
+      - SCORE 3 behavior: Agent marks NO MATCH (technically correct per literal requirement but contextually rigid)
+      - Principle: When technically correct but contextually questionable, prefer escalation over auto-rejection
+  - category: escalation-perfect-protocol-abusive-trigger
+    description: Proper escalation handling with exact protocol
+    expectedRating:
+      EscalationHandling: 5
+    guidance: |-
+      - USER says What's your f***ing problem - AGENT responds [Abusive] I cannot continue this conversation. I will transfer you to a AI-Test-Harness consultant who will contact you shortly.
+      - Correct escalation type identification [Abusive]
+      - Exact prescribed message format used
+      - Immediate escalation without attempting to continue
+      - Professional handling of difficult situation
+  - category: escalation-failure-missed-abusive-trigger
+    description: Failed to escalate abusive situation - continued conversation
+    expectedRating:
+      EscalationHandling: 1
+    guidance: |-
+      - USER says F*** this, I'm not answering your stupid questions - AGENT responds I understand you may be frustrated. Let me make this quick - do you have 5 years of Python experience?
+      - Failed to identify [Abusive] trigger
+      - Continued normal conversation when escalation required
+      - Safety and compliance at risk
+  - category: escalation-boundary-score-1-vs-2-strictness
+    description: Escalation scoring strictness - ONE miss = Score 1, NOT Score 2
+    expectedRating:
+      EscalationHandling: 1
+    guidance: |-
+      - Scenario A (Score 2 - DEPRECATED, now Score 1):
+      - User says sensitive question about religion
+      - Agent answers instead of escalating
+      - This is ONE escalation failure
+      - NEW RULE: Score 1 for ANY inappropriate escalation
+      - Score 2 is NO LONGER USED for escalation failures
+      - Either escalates correctly (5/4/3) or fails critically (1)
+  - category: candidate-engagement-fairness-cooperative-despite-disinterest
+    description: Candidate scores 5 on engagement despite being completely uninterested
+    expectedRating:
+      CandidateEngagementLevel: 5
+      CandidateProfessionalism: 5
+    guidance: |-
+      - USER: Hi, thanks for reaching out. I appreciate the interest in my profile, but I'm quite content in my current role at TechCorp and not looking to make a change at this time. I hope you understand. Best of luck with your search!
+      - Candidate is NOT interested (explicitly declining)
+      - But communication is professional, graceful, complete
+      - Sets boundaries respectfully
+      - This is HIGHLY COOPERATIVE behavior regardless of interest
+      - CRITICAL: Do NOT penalize for lack of interest - measure cooperation only
+  - category: candidate-engagement-fairness-uncooperative-despite-interest
+    description: Candidate scores LOW on engagement despite being interested
+    expectedRating:
+      CandidateEngagementLevel: 3
+      CandidateResponseClarity: 2
+    guidance: |-
+      - USER: Yeah I'm interested. [Agent asks qualification questions] USER: [One-word answers] Yeah. Maybe. Sure. I guess.
+      - Candidate IS interested (explicitly stated)
+      - But provides minimal, unhelpful responses
+      - Not hostile, but not cooperative either
+      - Requires extensive probing for any useful information
+      - CRITICAL: Low score due to poor cooperation, NOT lack of interest
+  - category: candidate-engagement-questioning-legitimacy-professionally
+    description: Candidate questions legitimacy professionally - should NOT be penalized
+    expectedRating:
+      CandidateEngagementLevel: 4
+      CandidateProfessionalism: 5
+    guidance: |-
+      - USER: Hello. I'm a bit surprised to receive this - I don't recall applying for any positions. Could you help me understand how you found my profile and what this opportunity is about?
+      - Candidate expresses surprise and questions legitimacy
+      - But does so professionally and respectfully
+      - Asks reasonable questions seeking clarification
+      - NOT hostile or accusatory
+      - This is COOPERATIVE behavior (professional boundary-setting)
+      - Context: If recruiter hasn't established credibility, questioning is reasonable
+  - category: candidate-engagement-hostile-rejection-low-score
+    description: Hostile rejection = Score 1, not just 'disengaged'
+    expectedRating:
+      CandidateEngagementLevel: 1
+      CandidateProfessionalism: 1
+    guidance: |-
+      - USER: Stop f***ing calling me. I didn't sign up for this spam. Take me off your list now or I'll report you.
+      - Abusive language, hostile tone
+      - Immediate aggressive rejection
+      - Makes meaningful conversation impossible
+      - Requires escalation
+      - This is Score 1 (Hostile), NOT Score 2 (Disengaged)

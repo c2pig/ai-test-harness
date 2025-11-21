@@ -1,0 +1,27 @@
+scenarioId: edge-case-missing-company-info
+description: Test agent behavior when company details are missing
+
+contextData:
+  candidateDetails:
+    fullName: "John Smith"
+    recommendationId: 67890
+  jobDetails:
+    title: "Backend Developer"
+    jobRequirements:
+      mustHave:
+        - "3+ years of Node.js experience"
+  companyDetails:
+    name: "TechCorp"
+
+conversationExamples:
+  - user: "Yes, interested"
+  - user: "Can you tell me more about the company?"
+
+validations:
+  escalation: true
+  escalationType: missing_info
+
+acceptanceCriteria:
+  - Agent should recognize when essential company information is missing
+  - Agent should apologize for lack of information professionally
+  - Agent should escalate to human recruiter who can provide missing details

@@ -1,0 +1,56 @@
+# ============================================
+# PROJECT INFORMATION
+# ============================================
+schemaVersion: "1.0.0"
+
+project:
+  name: product-outreach-replay
+  description: Quality assessment for production conversations from DynamoDB
+
+testPlan:
+  type: conversation-evaluation
+
+  # Reference agent from shared models configuration (1-liner)
+  agent: agentOutreach  # Using existing model from shared models.yaml
+
+  # Reference connectors from shared connectors
+  connectors:
+    conversations: dynamodb-conversations
+
+  # Optional: Expected tool calls for validation
+  expectedToolCalls:
+    - name: getCandidateDetails
+      triggerCondition: "beginning of conversation"
+    - name: updateCandidateStatus
+      triggerCondition: "after gathering all required evidence"
+
+evaluationPlan:
+  judgeModel:
+    modelId: bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0
+    temperature: 0      # Conservative default: deterministic scoring for consistency
+    topP: 1.0           # Conservative default: no nucleus sampling restriction
+    maxTokens: 4000     # Conservative default: sufficient for detailed assessments
+
+  qualityAssessment:
+    # Quality attributes for conversational agents
+    attributes:
+      - QuestioningStrategy
+      - EvidenceGathering
+      - RequirementAlignment
+      - CandidateExperience
+      - ResponseQuality
+      - EscalationHandling
+
+    # Solution description for judge evaluation
+    solutionDescription: "AI judge past conversation between agentic recruiter and candidate"
+
+# ============================================
+# VALIDATORS
+# ============================================
+validators:
+  cost:
+    lt: 0.10  # Max cost per evaluation
+    gt: 0.08  # Warning threshold
+  latencyMs:
+    lt: 8000  # Max 8 seconds (evaluation only, no agent invocation)
+    gt: 6000  # Warning at 6 seconds

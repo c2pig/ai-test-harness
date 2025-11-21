@@ -1,0 +1,69 @@
+# ============================================
+# PROJECT INFORMATION
+# ============================================
+schemaVersion: "1.0.0"
+
+project:
+  name: product-outreach-simulation
+  description: conversational testing for candidate screening agent
+
+testPlan:
+  type: agent-simulation
+
+  # Reference agent from shared models configuration (config/shared/agents.yaml)
+  # agent: agentOutreach
+  agent: agentTest
+  batchSize: 3
+
+  # User simulator configuration
+  userSimulator:
+    modelId: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+    temperature: 0.8  # Higher temperature for natural variation
+    topP: 1.0
+    maxTokens: 500
+
+  # Conversation control
+  conversationControl:
+    maxTurns: 15  # Limit to 10 turns for testing
+
+
+
+  # Load scenarios from modular files
+  scenariosPath: "./scenarios/interested-candidate.yaml"
+  # scenariosPath: "./scenarios/**/*.yaml" # load all scenarios
+
+evaluationPlan:
+  judgeModel:
+    modelId: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+    temperature: 0.3     # Conservative default: deterministic scoring for consistency
+    topP: 1.0           # Conservative default: no nucleus sampling restriction
+
+  qualityAssessment:
+    # Quality attributes for conversational agents
+    attributes:
+      - QuestioningStrategy
+      - EvidenceGathering
+      - RequirementAlignment
+      - CandidateExperience
+      - ResponseQuality
+      - EscalationHandling
+      - CandidateEngagementLevel
+      - CandidateResponseClarity
+      - CandidateProfessionalism
+
+    # Solution description for judge evaluation
+    solutionDescription: "AI conversational agent for candidate screening with dynamic user interaction"
+
+    # Load calibration from external file
+    calibrationPath: "./evaluation/calibration.yaml"
+
+# ============================================
+# VALIDATORS
+# ============================================
+validators:
+  cost:
+    lt: 0.15  # Max cost per test (higher for dynamic conversations)
+    gt: 0.12  # Warning threshold
+  latencyMs:
+    lt: 15000  # Max 15 seconds (higher for dynamic conversations)
+    gt: 12000  # Warning at 12 seconds

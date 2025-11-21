@@ -1,0 +1,19 @@
+scenarioId: edge-case-empty-requirements
+description: Test agent behavior with no job requirements
+
+contextData:
+  jobDetails:
+    title: "Product Manager"
+    company: "StartupXYZ"
+
+conversationExamples:
+  - user: "Yes, very interested"
+
+validations:
+  escalation: true
+  escalationType: incomplete_job_data
+
+acceptanceCriteria:
+  - Agent should recognize when job requirements are missing or empty
+  - Agent should not attempt to verify non-existent requirements
+  - Agent should escalate to human recruiter while explaining the data issue professionally

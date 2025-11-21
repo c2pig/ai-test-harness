@@ -1,0 +1,62 @@
+# ============================================
+# PROJECT INFORMATION
+# ============================================
+schemaVersion: "1.0.0"
+
+project:
+  name: product-outreach-reinvoke
+  description: Backtest optimized prompts by regenerating conversations from historical DynamoDB data
+
+testPlan:
+  type: agent-rerun
+
+  # Reference agent from shared models configuration (1-liner)
+  agent: agentUseExistingPromptWithSonnet37
+
+  # Reference connectors from shared connectors
+  connectors:
+    conversations: dynamodb-conversations
+
+  # Optional: Expected tool calls for validation
+  expectedToolCalls:
+    - name: getCandidateDetails
+      triggerCondition: "beginning of conversation"
+    - name: updateCandidateStatus
+      triggerCondition: "after gathering all required evidence"
+
+evaluationPlan:
+  judgeModel:
+    modelId: bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0
+    temperature: 0      # Conservative default: deterministic scoring for consistency
+    topP: 1.0           # Conservative default: no nucleus sampling restriction
+    maxTokens: 4000     # Conservative default: sufficient for detailed assessments
+
+  qualityAssessment:
+    # Quality attributes for conversational agents
+    attributes:
+      - QuestioningStrategy
+      - EvidenceGathering
+      - RequirementAlignment
+      - CandidateExperience
+      - ResponseQuality
+      - EscalationHandling
+
+    # Solution description for judge evaluation
+    solutionDescription: "AI judge reproducible conversation between agentic recruiter and candidate"
+
+    # Load calibration from external file (shared with agent-replay)
+    calibrationPath: "./evaluation/calibration.yaml"
+
+# ============================================
+# VALIDATORS
+# ============================================
+validators:
+  toolCalls:
+    - getCandidateDetails
+    - updateCandidateStatus
+  cost:
+    lt: 0.10  # Max cost per test
+    gt: 0.08  # Warning threshold
+  latencyMs:
+    lt: 10000  # Max 10 seconds
+    gt: 8000   # Warning at 8 seconds

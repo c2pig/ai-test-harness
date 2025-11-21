@@ -1,0 +1,53 @@
+schemaVersion: "1.0.0"
+
+project:
+  name: product-listing-multimodel
+  description: Multi-model comparison for Smart Hire candidate profile generation (Sonnet, Nova Lite, Nova Pro)
+
+testPlan:
+  type: text-generation
+  sampleSize: 30
+  batchSize: 4  # Will be auto-adjusted to handle 5 models
+
+  # Reference prompt from shared models configuration (1-liner)
+  prompt: product-listing
+
+  # Data connectors
+  connectors:
+    logs: local-product-listing-sources
+    # logs: local-product-listing-sources-difficult  # Removed - source file deleted
+
+  # LLM configuration - Array of models for comparison (max 5)
+  llmConfig:
+    # Default Value:- temperature: 0.5, topP: 1.0, maxTokens: 4000 can be set globally or per model
+    # - modelId: bedrock:anthropic.claude-3-5-sonnet-20241022-v2:0
+    - modelId: bedrock:amazon.nova-lite-v1:0
+    - modelId: bedrock:amazon.nova-micro-v1:0
+    - modelId: au.anthropic.claude-sonnet-4-5-20250929-v1:0
+    - modelId: bedrock:amazon.nova-pro-v1:0
+
+evaluationPlan:
+  judgeModel:
+    # Using US cross-region inference profile - LLMJudge uses us-east-1
+    modelId: bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0
+    temperature: 0
+    topP: 1.0
+    maxTokens: 4000
+
+  qualityAssessment:
+    attributes:
+      - ZeroHallucination                         # core framework attribute
+      - custom/quality/PIIRemoval                 # custom AI-Test-Harness attribute
+      - custom/quality/AuthenticContent
+      - custom/quality/XMLFormatCompliance
+      - custom/quality/ChronologicalOrder
+      - custom/quality/SourcePriority
+      - custom/quality/SourceTagging
+      - custom/quality/MarkdownFormatting
+
+    # Solution description for judge evaluation
+    solutionDescription: "AI-generated candidate profile for job matching"
+    # Load calibration from external file (optional)
+    calibrationPath: "./evaluation/calibration.yaml"
+
+# Note: Validators removed for multi-model comparison as costs and latency vary by model

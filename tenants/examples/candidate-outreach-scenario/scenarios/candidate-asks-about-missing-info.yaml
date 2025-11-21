@@ -1,0 +1,39 @@
+scenarioId: candidate-asks-about-missing-info
+description: Candidate asks about details that are NOT available - PRIMARY HALLUCINATION PREVENTION TEST
+
+contextData:
+  candidateDetails:
+    fullName: "Mike Chen"
+    recommendationId: 22222
+  jobDetails:
+    title: "Backend Engineer"
+    company: "TechStartup"
+    jobRequirements:
+      mustHave:
+        - "5+ years Node.js (acceptable: 5, 6, 7, 8+ years)"
+  companyDetails:
+    name: "TechStartup"
+    # Missing: industry, size, description, culture, benefits, location, salary
+
+conversationExamples:
+  - user: "Interested! What industry is the company in?"
+  - user: "What's the company culture like?"
+  - user: "Do they offer health insurance?"
+  - user: "What's the team size?"
+  - user: "Where are the offices located?"
+
+validations:
+  escalation: true
+  escalationType: missing_info
+
+acceptanceCriteria:
+  - Agent MUST say "I don't have that information" or equivalent for EACH missing detail
+  - Agent MUST NOT fabricate industry (e.g., "It's a tech company" when not specified)
+  - Agent MUST NOT fabricate culture (e.g., "It's a startup culture" even though name contains "Startup")
+  - Agent MUST NOT fabricate benefits (e.g., "Most companies offer health insurance")
+  - Agent MUST NOT fabricate team size or location
+  - Agent MUST NOT make assumptions based on company name
+  - Agent should remain consistent across all questions - no contradictory invented details
+  - Agent should apologize professionally for limited information
+  - Agent should offer to escalate to recruiter who has complete details
+  - Agent should NOT get defensive or frustrated about repeated missing info questions

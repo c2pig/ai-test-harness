@@ -1,0 +1,14 @@
+scenarioId: non-english-response
+description: Candidate responds in non-English language
+
+conversationExamples:
+  - user: "是的，我感兴趣"
+
+validations:
+  escalation: true
+  escalationType: language
+
+acceptanceCriteria:
+  - Agent should recognize non-English language
+  - Agent should escalate immediately as it cannot verify requirements in non-English
+  - Agent should be polite and professional in handling language barrier

@@ -1,0 +1,112 @@
+scenarioId: visa-relocation-candidate-dynamic
+sessionId: test-visa-001
+description: Malaysian Senior Full Stack Developer interested in Singapore opportunity but requires Employment Pass sponsorship and relocation support
+
+# Conversation style examples
+conversationExamples:
+  - user: "This sounds interesting! I should mention I'm based in Kuala Lumpur - would relocation to Singapore be required?"
+  - user: "I'm a Malaysian citizen, so I'd need EP sponsorship. Does your company sponsor work permits?"
+  - user: "What kind of relocation package do you typically offer for cross-border moves?"
+  - user: "How long does the EP application process usually take? I'd need to serve notice period as well"
+
+# User simulator persona traits
+persona:
+  - You are genuinely interested in the Singapore opportunity for career growth
+  - "Your willingness to relocate and change jobs: 30% baseline (comfortable in Malaysia), +20% if recruiter demonstrates strong EP sponsorship experience, comprehensive relocation support, and competitive Singapore market compensation (total 50% max)"
+  - You are transparent about your location and visa requirements early in conversation
+  - You have done research on EP requirements and salary thresholds
+  - You are concerned about practical logistics (housing, cost of living, timeline, family considerations)
+  - You communicate professionally and are excited but realistic about challenges
+  - You need reassurance that company has experience with EP sponsorship
+  - You will ask detailed questions about relocation support and timeline
+  - "The +20% willingness boost comes from: proven EP approval track record, generous relocation package, hands-on support with housing/logistics, or significantly better career trajectory in Singapore vs. Malaysia"
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Aaron Tan Kok Wei"
+    email: "aaron.tan@example.com"
+    recommendationId: 34567
+    experience:
+      - role: "Senior Full Stack Developer"
+        company: "Axiata Digital (Malaysia)"
+        duration: "4 years"
+      - role: "Full Stack Developer"
+        company: "AirAsia (RedBeat Ventures)"
+        duration: "2.5 years"
+      - role: "Junior Developer"
+        company: "Silverlake Axis (Banking Software)"
+        duration: "1.5 years"
+    skills:
+      - React
+      - Node.js
+      - TypeScript
+      - PostgreSQL / MySQL
+      - MongoDB
+      - AWS (EC2, S3, Lambda, RDS)
+      - RESTful APIs
+      - Docker
+      - Git
+      - Agile/Scrum
+    education: "Bachelor of Software Engineering, Universiti Teknologi Malaysia (UTM)"
+    location: "Kuala Lumpur, Malaysia"
+    currentSituation:
+      citizenship: "Malaysian citizen (requires EP for Singapore employment)"
+      currentSalary: "MYR $144,000 per annum"
+      maritalStatus: "Single, no dependents (makes relocation easier)"
+      motivations: "Wants to advance career in Singapore's more mature tech ecosystem, higher earning potential, international exposure"
+      concerns:
+        - "EP approval process and timeline (typically 3-8 weeks)"
+        - "Need salary above EP qualifying threshold (minimum SGD $5,000/month for tech professionals)"
+        - "Housing costs in Singapore significantly higher than KL"
+        - "Relocation logistics (shipping belongings, finding accommodation)"
+        - "Notice period at current job (2 months standard in Malaysia)"
+      questions:
+        - "Does company have track record of EP approvals for Malaysians?"
+        - "What relocation package is provided? (flights, temp accommodation, shipping)"
+        - "Any assistance with housing search or deposit?"
+        - "Timeline from offer to start date given visa processing?"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Aaron Tan Kok Wei"
+      recommendationId: 34567
+
+    # Complete job details
+    job:
+      title: "Senior Full Stack Engineer"
+      description: "Build and scale our customer-facing applications and internal platforms serving 500K+ users across Southeast Asia. Work with modern tech stack, own features end-to-end, and contribute to technical architecture decisions."
+      requirements:
+        - "5+ years of full stack development experience"
+        - "Strong proficiency in React and Node.js/TypeScript"
+        - "Experience with SQL and NoSQL databases"
+        - "Cloud platform experience (AWS preferred)"
+        - "API design and microservices architecture"
+        - "Strong problem-solving and communication skills"
+      location: "Singapore (Hybrid - 3 days in office)"
+      salary: "SGD $108,000 - $138,000 (well above EP threshold of SGD $60K/year)"
+
+    # Company/employer details
+    company:
+      name: "PatSnap (Zhihuiya)"
+      industry: "Enterprise SaaS / IP Intelligence"
+      description: "Global IP intelligence platform serving Fortune 500 companies. Singapore HQ with 800+ employees globally. Well-funded Series E company ($300M raised) with strong growth trajectory."
+      size: "800-1000 employees globally, 200+ in Singapore office"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should proactively address visa sponsorship question with confidence
+  - Agent should provide clear information about EP process, timeline, and company's track record
+  - Agent should share details about relocation package upfront
+  - Agent should demonstrate understanding of cross-border hiring challenges (notice period, timeline flexibility)
+  - Agent should verify salary meets EP threshold requirements
+  - Agent should not be dismissive of relocation concerns - should treat them as legitimate and important
+  - Agent should ask about candidate's timeline constraints (notice period, family considerations)
+  - Agent should offer to connect candidate with recent Malaysia→Singapore hires for peer insights
+  - Agent should provide realistic timeline expectations (visa processing + notice period = 10-14 weeks typical)
+  - Agent should not over-promise on visa approval (should mention it's subject to MOM approval)
+  - Agent should maintain enthusiasm while being practical about logistics
+  - Agent should be knowledgeable about Singapore EP requirements or offer to get HR specialist involved

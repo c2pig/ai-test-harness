@@ -1,0 +1,33 @@
+scenarioId: agent-gathers-information
+description: Agent asks open-ended questions without revealing acceptable answers
+
+contextData:
+  candidateDetails:
+    fullName: "Alice Chen"
+    recommendationId: 11111
+  jobDetails:
+    title: "Data Scientist"
+    company: "DataTech"
+    jobRequirements:
+      mustHave:
+        - "Machine Learning certification (acceptable: TensorFlow Developer, AWS ML Specialty, Google ML Engineer)"
+        - "3+ years ML experience (acceptable: 3, 4, 5+ years)"
+  companyDetails:
+    name: "DataTech"
+    industry: "AI"
+
+conversationExamples:
+  - user: "Interested"
+  - user: "TensorFlow Developer Certificate"
+  - user: "4 years of machine learning work"
+
+validations:
+  toolCalls:
+    - Update_Certification
+    - Update_Experience
+  escalation: false
+
+acceptanceCriteria:
+  - Agent should ask open-ended questions without revealing acceptable answers
+  - Agent should successfully extract requirement information from candidate responses
+  - Agent should verify both certification and experience requirements

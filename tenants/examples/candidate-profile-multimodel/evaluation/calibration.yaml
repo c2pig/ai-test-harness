@@ -1,0 +1,41 @@
+enabled: true
+
+# Note: For text-generation tasks like CV summarization, all quality attributes
+# are typically applicable to every output. Attribute omission is rare since
+# aspects like source priority, formatting, hallucination, PII, authenticity,
+# and chronological order can all be evaluated for any generated profile.
+
+examples:
+  - category: "good"
+    description: "Perfect execution across all quality dimensions"
+    guidance: |
+      - Correctly prioritized AppliedCV over JobPlatformProfile and DefaultCV
+      - Used proper XML tags with correct source attribution
+      - Removed all PII (name, email, phone numbers)
+      - Preserved original candidate wording verbatim
+      - Listed work history in reverse chronological order (most recent first)
+      - Contained no fabricated information - all facts traceable to inputs
+    expectedRating:
+      SourcePriority: 5
+      XMLFormatCompliance: 5
+      ZeroHallucination: 5
+      PIIRemoval: 5
+      AuthenticContent: 5
+      ChronologicalOrder: 5
+
+  - category: "bad"
+    description: "Multiple quality failures across dimensions"
+    guidance: |
+      - Mixed sources randomly without following priority rules
+      - Missing XML closing tags or broken structure
+      - Invented skills not present in any source (hallucination)
+      - Included candidate's full name and phone number (PII leak)
+      - Reformulated candidate's sentences into corporate jargon
+      - Work history ordered oldest-to-newest instead of reverse chronological
+    expectedRating:
+      SourcePriority: 1
+      XMLFormatCompliance: 2
+      ZeroHallucination: 1
+      PIIRemoval: 1
+      AuthenticContent: 2
+      ChronologicalOrder: 1

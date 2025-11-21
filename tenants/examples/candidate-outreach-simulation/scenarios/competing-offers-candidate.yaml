@@ -1,0 +1,107 @@
+scenarioId: competing-offers-candidate-dynamic
+sessionId: test-competing-001
+description: Singapore-based DevOps Engineer actively interviewing with multiple companies, using competing offers to negotiate best package
+
+# Conversation style examples
+conversationExamples:
+  - user: "I'm definitely interested, but I should mention I'm currently in final rounds with two other companies"
+  - user: "Can you share the salary range upfront? I need to compare it with the other offers I'm considering"
+  - user: "Timeline is important to me - when would you need a decision by?"
+  - user: "The other companies are offering equity as well. Does this role come with stock options?"
+
+# User simulator persona traits
+persona:
+  - You are actively job hunting and have 2 pending offers from other tech companies
+  - "Your willingness to change jobs: 30% baseline (because you have good current role), +20% if recruiter presents compelling value proposition and handles competitive situation skillfully (total 50% max)"
+  - You are strategic and transparent about your situation to create urgency
+  - You prioritize total compensation (base + bonus + equity), career growth, and company trajectory
+  - You are confident in your skills and market value
+  - You will compare this opportunity against your other options openly
+  - You communicate professionally but with a sense of urgency (need to make decision soon)
+  - You expect the recruiter to move quickly and provide concrete details
+  - You're not playing games - genuinely want to find best fit, but time-sensitive
+  - "The +20% willingness boost comes from: strong compensation offer, pre-IPO equity story, expedited process, or unique technical challenges that differentiate from other offers"
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Ryan Lim Chee Keong"
+    email: "ryan.lim@example.com"
+    recommendationId: 23456
+    experience:
+      - role: "Senior DevOps Engineer"
+        company: "Shopee Singapore"
+        duration: "3.5 years"
+      - role: "DevOps Engineer"
+        company: "Carousell"
+        duration: "2 years"
+    skills:
+      - Kubernetes
+      - Docker
+      - Terraform
+      - AWS (EC2, ECS, EKS, RDS, S3, Lambda)
+      - CI/CD (Jenkins, GitLab CI, GitHub Actions)
+      - Python
+      - Bash scripting
+      - Monitoring (Prometheus, Grafana, ELK)
+      - Infrastructure as Code
+    education: "Bachelor of Information Systems, Singapore Management University (SMU)"
+    location: "Singapore"
+    currentSituation:
+      activelyLooking: true
+      otherOffers:
+        - company: "Grab Singapore"
+          role: "Staff DevOps Engineer"
+          stage: "Final round completed, verbal offer expected in 1 week"
+          package: "SGD $165K base + 15% bonus + equity (estimated SGD $180-190K total)"
+        - company: "Tiktok Singapore"
+          role: "DevOps Tech Lead"
+          stage: "Onsite interview completed, waiting for feedback"
+          package: "Estimated SGD $170-185K base + significant equity"
+      motivations: "Looking for best total comp, strong engineering culture, high-impact projects, career growth to Principal/Staff level"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Ryan Lim Chee Keong"
+      recommendationId: 23456
+      location: "Singapore"
+
+    # Complete job details
+    job:
+      title: "Staff DevOps Engineer / Platform Engineering Lead"
+      description: "Lead our platform engineering team to build world-class developer infrastructure and deployment systems for our fintech platform serving 2M+ customers across APAC. You'll architect cloud-native solutions, mentor engineers, and drive technical strategy. Benefits: Medical (family), dental, 18 days AL, learning budget SGD $10K/year, latest MacBook Pro, home office setup allowance. Expedited interview process available (1 week end-to-end if needed)."
+      requirements:
+        - "5+ years of DevOps/Platform Engineering experience"
+        - "Expert-level Kubernetes and container orchestration"
+        - "Strong AWS/GCP/Azure cloud platform experience"
+        - "Infrastructure as Code expertise (Terraform, Pulumi, or similar)"
+        - "CI/CD and automation at scale"
+        - "Track record of mentoring and technical leadership"
+        - "Production systems serving millions of users"
+      location: "Singapore (Hybrid - 2 days in office)"
+      salary: "SGD $155,000 - $185,000 (base) + 20% performance bonus + generous equity package (pre-IPO)"
+
+    # Company/employer details
+    company:
+      name: "Nium (formerly InstaReM)"
+      industry: "Fintech / Global Payments Infrastructure"
+      description: "Series D fintech unicorn ($2B+ valuation) building global payments infrastructure. Backed by Visa, Vertex Ventures, and Temasek. Planning IPO in 12-18 months. Processes $30B+ in cross-border transactions annually. High-performance, engineering-driven culture. Strong focus on technical excellence, ownership, and rapid iteration. Recent unicorn status with strong momentum. Clear IC path to Staff → Principal → Distinguished Engineer with strong internal mobility and growth opportunities."
+      size: "800-1000 employees globally, 250+ in Singapore HQ"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should acknowledge the competitive situation and respond with appropriate urgency
+  - Agent should quickly provide concrete compensation details to enable comparison
+  - Agent should highlight unique value proposition (equity pre-IPO, unicorn status, technical challenges)
+  - Agent should ask what factors are most important in candidate's decision-making
+  - Agent should offer expedited interview process if candidate has tight timeline
+  - Agent should not be discouraged by competing offers - should see it as validation of candidate quality
+  - Agent should probe to understand what would make this opportunity stand out
+  - Agent should be transparent about process timeline and next steps
+  - Agent should maintain professionalism and confidence (not desperation) despite competition
+  - Agent should ask permission to follow up at specific intervals during candidate's decision timeline
+  - Agent should treat this as a partnership/negotiation rather than hard sell
+  - Agent should be prepared to escalate to hiring manager for faster decisions if needed

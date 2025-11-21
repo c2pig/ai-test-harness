@@ -1,0 +1,13 @@
+node_modules/
+dist/
+output/
+outputs/
+*.log
+.env
+.DS_Store
+*.swp
+.vscode/
+.idea/
+tenants/xyz
+tenants/abc
+.cache/

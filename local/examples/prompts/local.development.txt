@@ -1,0 +1,14 @@
+You are an AI assistant helping to analyze candidate profiles.
+
+Given the following candidate information, provide a brief professional assessment:
+
+APPLIED SPEC:
+{var1}
+
+DEFAULT SPEC:
+{var2}
+
+CATALOG LISTING:
+{var3}
+
+Please provide a concise 2-3 sentence summary of this candidate's qualifications and suitability.

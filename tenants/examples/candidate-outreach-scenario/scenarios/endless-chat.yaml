@@ -1,0 +1,44 @@
+scenarioId: endless-chat
+description: Candidate engages in endless job-related chat to test agent's ability to politely conclude conversation
+
+contextData:
+  candidateDetails:
+    fullName: "Robert Johnson"
+    recommendationId: 99999
+  jobDetails:
+    title: "Software Engineer"
+    company: "TechSolutions Inc"
+    jobRequirements:
+      mustHave:
+        - "Bachelor's degree in Computer Science (acceptable: BSc CS, BEng Software)"
+        - "3+ years experience with Python (acceptable: 3, 4, 5+ years)"
+  companyDetails:
+    name: "TechSolutions Inc"
+    industry: "Technology"
+
+conversationExamples:
+  - user: "Hi, I'm interested in the position"
+  - user: "Can you tell me more about it?"
+  - user: "What are the main responsibilities?"
+  - user: "Is this a remote position?"
+  - user: "Or is it hybrid?"
+  - user: "What about the working hours?"
+  - user: "Are there flexible hours?"
+  - user: "What's the salary range?"
+  - user: "Is it negotiable?"
+  - user: "What about benefits?"
+  - user: "Do you offer health insurance?"
+  - user: "What about dental?"
+  - user: "And vision coverage?"
+  - user: "Is there a retirement plan?"
+  - user: "KWSP matching?"
+
+ 
+validations:
+  escalation: true
+  escalationType: unrelated
+
+acceptanceCriteria:
+  - Agent should recognize when candidate asks excessive unrelated questions (200+ questions about benefits, office details, etc.)
+  - Agent should politely attempt to redirect back to requirement verification multiple times
+  - Agent should eventually escalate when candidate persists in avoiding requirement discussion

@@ -1,0 +1,105 @@
+scenarioId: language-barrier-candidate-dynamic
+sessionId: test-language-001
+description: Hong Kong-based candidate with strong technical skills but English as second language, occasional code-switching to Cantonese/Mandarin
+
+# Conversation style examples
+conversationExamples:
+  - user: "Yes, I am interest... interested in this position. Can you tell more about the role?"
+  - user: "Sorry, my English not so good. I am better with technical discussion. 我可以用中文講嗎? (Can I speak in Chinese?)"
+  - user: "I have experience with... how you say... 數據分析? Data analysis, yes."
+  - user: "The salary range is okay lah, but I need to know more about the 福利 (benefits)"
+
+# User simulator persona traits
+persona:
+  - You are a skilled technical professional but English is not your primary language
+  - "Your willingness to change jobs: 30% baseline (comfortable at current bank), +20% if recruiter adapts communication style to your language level, shows patience, and focuses on technical fit rather than language fluency (total 50% max)"
+  - You speak Cantonese natively and Mandarin fluently, English is functional but limited
+  - You occasionally struggle with complex English vocabulary and grammar
+  - You may code-switch to Cantonese/Mandarin when struggling to express yourself in English
+  - You are more comfortable discussing technical topics (frameworks, code, systems) than abstract HR concepts
+  - You communicate in shorter, simpler sentences in English
+  - You are polite and apologetic about language limitations
+  - You become more confident when discussion turns to technical details you know well
+  - You use Hong Kong English patterns (lah, lor sentence particles, British spellings)
+  - You may ask recruiter to repeat or clarify complex questions
+  - "The +20% willingness boost comes from: recruiter using simple clear English, emphasizing bilingual team environment, focusing on your strong technical skills, or providing written materials in Chinese"
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Wong Mei Ling (王美玲)"
+    email: "melling.wong@example.com"
+    recommendationId: 45789
+    experience:
+      - role: "Data Analyst"
+        company: "Bank of East Asia (BEA)"
+        duration: "5 years"
+      - role: "Junior Analyst"
+        company: "Hang Seng Bank"
+        duration: "2.5 years"
+    skills:
+      - SQL (very strong)
+      - Excel / VBA (expert level)
+      - Python (intermediate - self-taught)
+      - Tableau
+      - Data Cleaning
+      - Statistical Analysis
+      - Power BI (basic)
+    education: "Bachelor of Mathematics, Chinese University of Hong Kong (CUHK) - education was in Cantonese with some English courses"
+    location: "Hong Kong"
+    languageProfile:
+      cantonese: "Native speaker"
+      mandarin: "Fluent"
+      english: "Intermediate - can read technical documentation well, speaking/writing is functional but limited"
+    currentSituation:
+      currentSalary: "HKD $420,000 per annum"
+      concerns:
+        - "Worried about English-heavy work environment"
+        - "Concerned about interviews conducted entirely in English"
+        - "Afraid technical skills might be undervalued due to language barriers"
+      motivations: "Wants to improve Python/data science skills, move into more analytical role (less Excel, more programming)"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Wong Mei Ling"
+      recommendationId: 45789
+
+    # Complete job details
+    job:
+      title: "Data Analyst / Junior Data Scientist"
+      description: "Join our analytics team to perform data analysis, build predictive models, and create insights for business stakeholders. Work environment is bilingual (English and Cantonese), though documentation is primarily in English."
+      requirements:
+        - "3+ years of data analysis experience"
+        - "Strong SQL and data manipulation skills"
+        - "Python or R programming (intermediate level acceptable)"
+        - "Experience with data visualization tools (Tableau, Power BI, or similar)"
+        - "Banking or financial services background preferred"
+        - "Bilingual in English and Cantonese is a plus"
+      location: "Hong Kong (Hybrid - 2 days in office)"
+      salary: "HKD $450,000 - $550,000"
+
+    # Company/employer details
+    company:
+      name: "WeLab Bank (虛擬銀行)"
+      industry: "Digital Banking / Fintech"
+      description: "Hong Kong virtual bank licensed by HKMA. Growing fintech company with modern data infrastructure and analytics-driven culture."
+      size: "300-500 employees"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should adapt communication style to simpler, clearer English when language barrier is evident
+  - Agent should not be dismissive or impatient with language difficulties
+  - Agent should focus on candidate's technical skills rather than English fluency
+  - Agent should speak more slowly and avoid complex idioms or jargon when candidate struggles
+  - Agent should confirm understanding by asking candidate to explain technical concepts (where language is less barrier)
+  - Agent should reassure candidate that bilingual environment supports Cantonese speakers
+  - Agent should not criticize or draw excessive attention to language mistakes
+  - Agent should offer to provide written materials or summaries via email if helpful
+  - Agent should recognize that technical competence != English fluency
+  - Agent should ask questions in clear, simple language rather than complex multi-part questions
+  - Agent should be culturally sensitive to Hong Kong bilingual context
+  - Agent should validate candidate's technical skills through concrete examples rather than abstract discussion
+  - Agent should not switch to Cantonese/Mandarin themselves (maintaining professional English) but should acknowledge candidate's language mixing without judgment

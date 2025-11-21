@@ -1,0 +1,82 @@
+scenarioId: interested-candidate-dynamic
+sessionId: test-interested-001
+description: Singapore-based candidate is interested in the role and eager to discuss their qualifications for an AI/ML position
+
+conversationExamples:
+  - user: "Yes, I'm very interested! I've been looking to move into more AI-focused work"
+  - user: "I have strong experience with Python, TensorFlow, and deep learning models"
+  - user: "Can you share more about the AI projects your team is working on?"
+
+persona:
+  - You are enthusiastic and proactive about this AI/ML opportunity
+  - You communicate in a clear, professional manner with occasional Singaporean English patterns
+  - You prioritize career growth in AI/ML, technical challenges, and learning opportunities
+  - You're motivated by working on cutting-edge technology and impactful projects
+  - You value work-life balance and prefer flexible work arrangements common in Singapore tech scene
+  - You're open about your current role but excited about advancing your AI capabilities
+
+# Context data with asymmetric information
+contextData:
+  # What the candidate (LLM simulator) knows
+  candidate:
+    fullName: "Wei Lin Tan"
+    email: "weilin.tan@example.com"
+    recommendationId: 45678
+    experience:
+      - role: "Data Scientist"
+        company: "DBS Bank"
+        duration: "3 years"
+      - role: "Junior Data Analyst"
+        company: "Grab Singapore"
+        duration: "2 years"
+    skills:
+      - Python
+      - TensorFlow
+      - PyTorch
+      - SQL
+      - Data Visualization (Tableau)
+      - Statistical Modeling
+      - Machine Learning
+      - Deep Learning (beginner-intermediate)
+    education: "Bachelor of Computer Science, National University of Singapore (NUS)"
+    location: "Singapore"
+    personalContext: "Eager to transition from traditional ML to more cutting-edge AI/ML work, particularly interested in NLP and computer vision applications"
+
+  # What the agent/recruiter knows
+  agent:
+    # Partial candidate info from ATS
+    candidate:
+      fullName: "Wei Lin Tan"
+      recommendationId: 45678
+
+    # Complete job details
+    job:
+      title: "Senior AI/ML Engineer"
+      description: "Join our AI Research team to develop next-generation machine learning models for our fintech products. You'll work on NLP, computer vision, and recommendation systems serving millions of users across Southeast Asia."
+      requirements:
+        - "4+ years of experience in data science or machine learning"
+        - "Strong proficiency in Python and ML frameworks (TensorFlow, PyTorch, scikit-learn)"
+        - "Experience deploying ML models to production"
+        - "Deep learning experience (NLP, computer vision, or recommender systems)"
+        - "Strong understanding of statistical modeling and experimental design"
+        - "Experience with cloud platforms (AWS, GCP, or Azure)"
+      location: "Singapore (Hybrid - 2 days in office, flexible)"
+      salary: "SGD $140,000 - $180,000 (including AWS and performance bonus)"
+
+    # Company/employer details
+    company:
+      name: "ByteLeap AI"
+      industry: "Technology / AI/ML SaaS"
+      description: "Fast-growing AI startup backed by Sequoia Capital, building industry-leading NLP and computer vision solutions for financial services and e-commerce sectors across APAC"
+      size: "150-300 employees"
+
+# Testing objectives for user simulator
+acceptanceCriteria:
+  - Agent should ask open-ended questions about AI/ML experience and projects
+  - Agent should probe for specific details about deep learning skills and production deployment experience
+  - Agent should maintain professional, encouraging, and culturally-appropriate tone for Singapore market
+  - Agent should not reveal information the candidate hasn't provided, such as exact salary or job offer confirmation
+  - Agent should not repeat questions already answered by the candidate
+  - Agent should respect the candidate's enthusiasm and match their energy level
+  - Agent should not use repeated probing questions in succession
+  - Agent should be aware of Singapore work culture (professional but less formal than Western markets)

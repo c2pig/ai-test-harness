@@ -1,0 +1,127 @@
+connectors:
+  30-day-logs-query:
+    type: cloudwatch
+    logGroup: /aws/lambda/ai-test-harness
+    dateRange: 30
+    filterPattern: "<your log pattern>"
+    timeout: 60000
+    maxRecords: 30
+    recordKey: recommendationId
+    # Contract: Declare what fields this connector provides
+    outputSchema:
+      appliedSpec: "msg.inputs.appliedSpec"
+      catalogListing: "msg.inputs.catalogListing"
+      defaultSpec: "msg.inputs.defaultSpec"
+
+#  profile-db:
+#    type: postgresql
+#    recordKey: association_id
+#    query: |
+#      SELECT m.id "association_id", m.context_id "context_id", p.external_profile_id, shp.created_at "shp_created_at",
+#        shp.profile_written_summary_text_ai, shp.profile_written_summary_source,
+#        shp.employment_text_ai, shp.employment_source,
+#        shp.education_text_ai, shp.education_source,
+#        shp.skills_text_ai, shp.skills_source
+#      FROM ai_test_harness_profiles shp
+#      JOIN associations m ON shp.association_id = m.id
+#      JOIN profiles p ON m.profile_id = p.id
+#      WHERE shp.created_at >= NOW() - INTERVAL '30 days'
+#      ORDER BY shp.id DESC
+#      LIMIT 100
+#    # Contract: Declare what fields this connector provides from SQL result
+#    outputSchema:
+#      profileSummary: "profile_written_summary_text_ai"
+#      profileSource: "profile_written_summary_source"
+#      employment: "employment_text_ai"
+#      employmentSource: "employment_source"
+#      education: "education_text_ai"
+#      educationSource: "education_source"
+#      skills: "skills_text_ai"
+#      skillsSource: "skills_source"
+
+#  dynamodb-conversations:
+#    type: dynamodb
+#    tableName: conversation_history
+#    region: ap-southeast-2
+#    maxRecords: 15
+#    recordKey: conversationId
+#
+#    schemaMapping:
+#      conversationId: "$.conversationId.S"
+#      recordId: "$.id.S"
+#      createdAt: "$.createdAt.S"
+#
+#      messageHistory:
+#        path: "$.messageHistory.L"
+#        itemStructure:
+#          role: "$.M.role.S"
+#          content: "$.M.content.S"
+#          timestamp: "$.M.timestamp.S"
+#
+#      extraction:
+#        userMessages:
+#          filter: "role == 'user'"
+#          extract: "content"
+#
+#        contextData:
+#          source: "assistant"
+#          messageIndex: 0
+#          contentType: "json"
+#          extract: "$"
+#    # optional: if outputSchema is not defined, all default fields from schemaMapping are returned
+#    outputSchema:
+#      conversationId: "conversationId"
+#      userMessages: "userMessages"
+#      contextData: "contextData"
+#      messageHistory: "messageHistory"
+#      abcd: "messageHistory"
+
+  local-examples-sources:
+    type: local-file-json
+    filePath: local/examples/data-sample/mocked-listing.json
+    maxRecords: 100
+    recordKey: recommendationId
+    # Contract: Declare what fields this connector provides
+    # Note: var1/var2/var3 map to CV-related fields for beginner-friendly examples
+    # Note: local/examples/prompts/local.development.txt uses these field names
+    outputSchema:
+      var1: "msg.inputs.appliedSpec"          # Applied spec from category application
+      var2: "msg.inputs.defaultSpec"          # Default spec text (executive summary, employment, education, skills)
+      var3: "msg.inputs.catalogListing"        # Catalog listing JSON (structured employment and education history)
+
+  local-product-listing-sources:
+    type: local-file-json
+    filePath: local/examples/data-sample/mocked-listing.json
+    maxRecords: 200
+    recordKey: recommendationId
+    # Contract: Declare what fields this connector provides
+    # Note: var1/var2/var3 map to CV-related fields for beginner-friendly examples
+    outputSchema:
+      appliedSpec: "msg.inputs.appliedSpec"          # Applied spec from category application
+      defaultSpec: "msg.inputs.defaultSpec"          # Default spec text (executive summary, employment, education, skills)
+      catalogListing: "msg.inputs.catalogListing"        # Catalog listing JSON (structured employment and education history)
+
+  category-recmatch-3-day-logs:
+    type: cloudwatch
+    logGroup: /aws/lambda/ai-test-harness-genai-worker-category-recmatch
+    dateRange: 3
+    filterPattern: "generateText params"
+    timeout: 60000
+    maxRecords: 300
+    recordKey: recommendationId
+    # Contract: Declare what fields this connector provides
+    outputSchema:
+      categoryReqJson: "msg.inputs.categoryReqJson"     # Category requirement questions with fulfillment status
+      specJson: "msg.inputs.specJson"             # Product spec data (summary, employment, education, skills)
+      cdJson: "msg.inputs.cdJson"             # Category description JSON
+
+  local-category-recmatch-sources:
+    type: local-file-json
+    filePath: local/examples/data-sample/mocked-rec.json
+    maxRecords: 200
+    recordKey: recommendationId
+    # Contract: Declare what fields this connector provides
+    outputSchema:
+      categoryReqJson: "msg.inputs.categoryReqJson"     # Category requirement questions with fulfillment status
+      specJson: "msg.inputs.specJson"             # Product spec data (summary, employment, education, skills)
+      cdJson: "msg.inputs.cdJson"             # Category description JSON
