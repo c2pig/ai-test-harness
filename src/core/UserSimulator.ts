@@ -1,8 +1,11 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { Logger } from '../utils/logger';
 import { PromptLoader } from '../utils/promptLoader';
 import { retryWithBackoff } from '../utils/retry';
+import {
+  ILLMClient,
+  LLMClientFactory,
+  ChatRequest,
+} from '../llm';
 
 export interface UserSimulatorConfig {
   modelId: string;
@@ -49,37 +52,33 @@ export interface UserResponse {
   metrics: UserSimulatorMetrics;
 }
 
+/**
+ * User Simulator for agent conversation testing
+ *
+ * Supports dependency injection for testing:
+ *   const mockClient = new MockAdapter();
+ *   const simulator = new UserSimulator(config, mockClient);
+ *
+ * Or uses LLMClientFactory for provider switching via env vars:
+ *   LLM_PROVIDER=litellm LITELLM_URL=... npm run test:tenant
+ */
 export class UserSimulator {
-  private client: BedrockRuntimeClient;
+  private client: ILLMClient;
   private config: UserSimulatorConfig;
 
-  constructor(config: UserSimulatorConfig) {
+  constructor(config: UserSimulatorConfig, client?: ILLMClient) {
     const resolvedRegion = config.region || 'us-east-1';
-    this.client = new BedrockRuntimeClient({
-      region: resolvedRegion,
-      requestHandler: new NodeHttpHandler({
-        requestTimeout: 90000, // 90 seconds
-        connectionTimeout: 5000, // 5 seconds to establish connection
-        throwOnRequestTimeout: true, // Convert timeout warning to error for retry
-      }),
-    });
+    // Allow injection for testing, otherwise use factory
+    this.client = client || LLMClientFactory.create({ region: resolvedRegion });
     this.config = config;
 
-    Logger.info(`[UserSimulator] Initialized with model: ${config.modelId}, region: ${resolvedRegion} (timeout: 90s)`);
+    Logger.info(
+      `[UserSimulator] Initialized with model: ${config.modelId}, region: ${resolvedRegion}`
+    );
     Logger.info(
       `[UserSimulator] Temperature: ${config.temperature}, TopP: ${config.topP}, MaxTokens: ${config.maxTokens}`
     );
-  }
-
-  private getModelFamily(modelId: string): 'anthropic' | 'nova' {
-    const cleanId = modelId.replace('bedrock:', '').toLowerCase();
-    if (cleanId.includes('anthropic') || cleanId.includes('claude')) {
-      return 'anthropic';
-    }
-    if (cleanId.includes('amazon.nova') || cleanId.includes('nova')) {
-      return 'nova';
-    }
-    throw new Error(`[UserSimulator] Unsupported model family: ${modelId}`);
+    Logger.info(`[UserSimulator] Using ${client ? 'injected' : 'factory'} client`);
   }
 
   /**
@@ -103,103 +102,40 @@ export class UserSimulator {
     const modelId = this.config.modelId.replace('bedrock:', '');
     Logger.info(`[UserSimulator] Invoking model: ${modelId}`);
 
-    const startTime = Date.now();
     const timestamp = new Date().toISOString();
 
     try {
-      // Build request body based on model family
-      const modelFamily = this.getModelFamily(this.config.modelId);
-      let requestBody: any;
+      // Build chat request
+      const request: ChatRequest = {
+        model: this.config.modelId,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: this.config.temperature,
+        top_p: this.config.topP,
+        max_tokens: this.config.maxTokens,
+      };
 
-      if (modelFamily === 'anthropic') {
-        // Anthropic Claude Messages API format (snake_case)
-        requestBody = {
-          anthropic_version: 'bedrock-2023-05-31',
-          messages: [
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          max_tokens: this.config.maxTokens,
-          temperature: this.config.temperature,
-        };
+      Logger.info(`[UserSimulator] Sending request via LLM client...`);
 
-        // Only include topP if it's not the default value of 1.0
-        if (this.config.topP !== 1.0) {
-          requestBody.top_p = this.config.topP;
-        }
-      } else if (modelFamily === 'nova') {
-        // Amazon Nova format (camelCase in inferenceConfig)
-        requestBody = {
-          schemaVersion: 'messages-v1',
-          messages: [
-            {
-              role: 'user',
-              content: [{ text: prompt }],
-            },
-          ],
-          inferenceConfig: {
-            maxTokens: this.config.maxTokens,
-            temperature: this.config.temperature,
-          },
-        };
-
-        // Only include topP if it's not the default value of 1.0
-        if (this.config.topP !== 1.0) {
-          requestBody.inferenceConfig.topP = this.config.topP;
-        }
-      }
-
-      const command = new InvokeModelCommand({
-        modelId,
-        body: JSON.stringify(requestBody),
-      });
-
-      Logger.info(`[UserSimulator] Sending request to Bedrock...`);
+      // Use retry wrapper around client.chat
       const response = await retryWithBackoff(
-        () => this.client.send(command),
+        () => this.client.chat(request),
         3,
         1000,
         'UserSimulator'
       );
-      const latencyMs = Date.now() - startTime;
 
-      const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-
-      // Parse response format based on model family
-      let generatedText: string;
-      let inputTokens: number;
-      let outputTokens: number;
-
-      if (modelFamily === 'anthropic') {
-        // Anthropic Claude Messages API format (snake_case)
-        generatedText = responseBody.content?.[0]?.text || '';
-        inputTokens = responseBody.usage?.input_tokens || 0;
-        outputTokens = responseBody.usage?.output_tokens || 0;
-      } else if (modelFamily === 'nova') {
-        // Amazon Nova format (camelCase)
-        generatedText = responseBody.output?.message?.content?.[0]?.text || '';
-        inputTokens = responseBody.usage?.inputTokens || 0;
-        outputTokens = responseBody.usage?.outputTokens || 0;
-      } else {
-        throw new Error(
-          `[UserSimulator] Unsupported model family for response parsing: ${modelFamily}`
-        );
-      }
-
-      const totalTokens = inputTokens + outputTokens;
+      const { content, usage, latency_ms } = response;
 
       // Parse response for END_CONVERSATION tag and reasoning
-      const { message, shouldEnd, reasoning } = this.parseUserResponse(generatedText);
+      const { message, shouldEnd, reasoning } = this.parseUserResponse(content);
 
       Logger.info(`[UserSimulator] ✓ Response generated`);
       Logger.info(`[UserSimulator] Message length: ${message.length} characters`);
       Logger.info(`[UserSimulator] Should end: ${shouldEnd}`);
       Logger.info(
-        `[UserSimulator] Tokens: ${inputTokens} input, ${outputTokens} output, ${totalTokens} total`
+        `[UserSimulator] Tokens: ${usage.prompt_tokens} input, ${usage.completion_tokens} output, ${usage.total_tokens} total`
       );
-      Logger.info(`[UserSimulator] Latency: ${latencyMs}ms`);
+      Logger.info(`[UserSimulator] Latency: ${latency_ms}ms`);
 
       return {
         message,
@@ -208,10 +144,10 @@ export class UserSimulator {
         prompt: conversationHistory.length === 0 ? prompt : undefined, // Capture prompt only for first turn
         metrics: {
           modelId,
-          inputTokens,
-          outputTokens,
-          totalTokens,
-          latencyMs,
+          inputTokens: usage.prompt_tokens,
+          outputTokens: usage.completion_tokens,
+          totalTokens: usage.total_tokens,
+          latencyMs: latency_ms,
           timestamp,
           inferenceConfig: {
             temperature: this.config.temperature,
@@ -333,13 +269,10 @@ export class UserSimulator {
   }
 
   /**
-   * Destroy the Bedrock client to clean up HTTP connections
-   * Call this when the test runner is done to prevent hanging
+   * Destroy the LLM client to clean up resources
    */
   destroy(): void {
-    if (this.client) {
-      this.client.destroy();
-      Logger.info('[UserSimulator] ✓ Bedrock client destroyed');
-    }
+    this.client.destroy();
+    Logger.info('[UserSimulator] ✓ Client destroyed');
   }
 }

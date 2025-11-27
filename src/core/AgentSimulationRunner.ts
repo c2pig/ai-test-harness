@@ -168,8 +168,8 @@ export class AgentSimulationRunner extends BaseRunner {
     // Initialize user simulator
     // Apply user simulator defaults
     const userSimulatorConfig = applyUserSimulatorDefaults(userSimulator);
-    // Pass region from evaluationPlan to user simulator
-    userSimulatorConfig.region = config.evaluationPlan.region;
+    // Pass region from testPlan to user simulator (fallback to evaluationPlan.region)
+    userSimulatorConfig.region = testPlan.region || config.evaluationPlan.region;
     const userSimulatorInstance = new UserSimulator(userSimulatorConfig);
 
     // Initialize conversation controller

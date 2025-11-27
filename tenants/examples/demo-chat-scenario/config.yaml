@@ -11,7 +11,7 @@ testPlan:
   type: agent-scenario
 
   # Reference agent from shared models configuration (1-liner)
-  agent: agentUseExistingPromptWithSonnet37
+  agent: agentOutreach
 
   # Load scenarios from modular files
   scenariosPath: "./scenarios/**/*.yaml"

@@ -13,7 +13,7 @@ testPlan:
 
   # Data connectors
   connectors:
-    logs: 60-day-logs-query
+    logs: local-examples-sources
 
   # LLM configuration for text generation
   llmConfig:

@@ -9,9 +9,9 @@ connectors:
     recordKey: recommendationId
     # Contract: Declare what fields this connector provides
     outputSchema:
-      appliedSpec: "msg.inputs.appliedSpec"
-      catalogListing: "msg.inputs.catalogListing"
-      defaultSpec: "msg.inputs.defaultSpec"
+      var1: "msg.inputs.appliedSpec"
+      var2: "msg.inputs.catalogListing"
+      var3: "msg.inputs.defaultSpec"
 
 #  profile-db:
 #    type: postgresql
@@ -97,9 +97,9 @@ connectors:
     # Contract: Declare what fields this connector provides
     # Note: var1/var2/var3 map to CV-related fields for beginner-friendly examples
     outputSchema:
-      appliedSpec: "msg.inputs.appliedSpec"          # Applied spec from category application
-      defaultSpec: "msg.inputs.defaultSpec"          # Default spec text (executive summary, employment, education, skills)
-      catalogListing: "msg.inputs.catalogListing"        # Catalog listing JSON (structured employment and education history)
+      var1: "msg.inputs.appliedSpec"          # Applied spec from category application
+      var2: "msg.inputs.catalogListing"        # Catalog listing JSON (structured employment and education history)
+      var3: "msg.inputs.defaultSpec"          # Default spec text (executive summary, employment, education, skills)
 
   category-recmatch-3-day-logs:
     type: cloudwatch

@@ -1,8 +1,11 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { Logger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
 import { generateAssessmentPrompt, CalibrationExample } from '../quality-library';
+import {
+  ILLMClient,
+  LLMClientFactory,
+  ChatRequest,
+} from '../llm';
 
 export interface LLMJudgeMetrics {
   modelId: string;
@@ -32,50 +35,23 @@ export interface EvaluateResult {
   };
 }
 
+/**
+ * LLM Judge for quality assessment
+ *
+ * Supports dependency injection for testing:
+ *   const mockClient = new MockAdapter();
+ *   const judge = new LLMJudge('us-east-1', mockClient);
+ *
+ * Or uses LLMClientFactory for provider switching via env vars:
+ *   LLM_PROVIDER=litellm LITELLM_URL=... npm run test:tenant
+ */
 export class LLMJudge {
-  private client: BedrockRuntimeClient;
+  private client: ILLMClient;
 
-  constructor(region?: string) {
-    const resolvedRegion = region || 'us-east-1';
-    this.client = new BedrockRuntimeClient({
-      region: resolvedRegion,
-      requestHandler: new NodeHttpHandler({
-        requestTimeout: 90000, // 90 seconds
-        connectionTimeout: 5000, // 5 seconds to establish connection
-        throwOnRequestTimeout: true, // Convert timeout warning to error for retry
-      }),
-    });
-    Logger.info(`[LLMJudge] Initialized Bedrock client for region: ${resolvedRegion} (timeout: 90s)`);
-  }
-
-  private getModelFamily(
-    modelId: string
-  ): 'anthropic' | 'nova' | 'meta' | 'qwen' | 'openai' | 'deepseek' {
-    // Remove bedrock: prefix and cross-region prefixes (us., eu., apac., au., etc.)
-    const cleanId = modelId
-      .replace('bedrock:', '')
-      .replace(/^(us|eu|apac|au)\./i, '')
-      .toLowerCase();
-
-    if (cleanId.includes('anthropic') || cleanId.includes('claude')) {
-      return 'anthropic';
-    }
-    if (cleanId.includes('amazon.nova') || cleanId.includes('nova')) {
-      return 'nova';
-    }
-    if (cleanId.includes('meta.llama')) {
-      return 'meta';
-    }
-    if (cleanId.includes('qwen.')) {
-      return 'qwen';
-    }
-    if (cleanId.includes('openai.')) {
-      return 'openai';
-    }
-    if (cleanId.includes('deepseek.')) {
-      return 'deepseek';
-    }
-    throw new Error(`[LLMJudge] Unsupported model family: ${modelId}`);
+  constructor(region?: string, client?: ILLMClient) {
+    // Allow injection for testing, otherwise use factory
+    this.client = client || LLMClientFactory.create({ region });
+    Logger.info(`[LLMJudge] Initialized with ${client ? 'injected' : 'factory'} client`);
   }
 
   async evaluate(
@@ -123,15 +99,14 @@ export class LLMJudge {
       totalLatency: number;
       totalInput: number;
       totalOutput: number;
-      startTime: number;
       timestamp: string;
     },
     originalPrompt?: string
   ): Promise<EvaluateResult> {
     // Track original prompt for return value
     const promptToReturn = originalPrompt || prompt;
-    const cleanModelId = modelId.replace('bedrock:', '');
-    Logger.info(`[LLMJudge] Invoking model: ${cleanModelId} (attempt ${attempt}/2)`);
+    const cleanedModelId = modelId.replace('bedrock:', '');
+    Logger.info(`[LLMJudge] Invoking model: ${cleanedModelId} (attempt ${attempt}/2)`);
 
     // Apply conservative defaults
     const temperature = inferenceConfig?.temperature ?? 0;
@@ -144,151 +119,42 @@ export class LLMJudge {
         totalLatency: 0,
         totalInput: 0,
         totalOutput: 0,
-        startTime: Date.now(),
         timestamp: new Date().toISOString(),
       };
     }
 
-    // Build request body based on model family
-    const modelFamily = this.getModelFamily(modelId);
-    let requestBody: any;
-
-    if (modelFamily === 'anthropic') {
-      // Anthropic Claude Messages API format (snake_case)
-      requestBody = {
-        anthropic_version: 'bedrock-2023-05-31',
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        max_tokens: maxTokens,
-        temperature: temperature,
-      };
-
-      // Only include topP if it's not the default value of 1.0
-      if (topP !== 1.0) {
-        requestBody.top_p = topP;
-      }
-
-      Logger.info(
-        `[LLMJudge] Request config: max_tokens=${maxTokens}, temperature=${temperature}, top_p=${topP}`
-      );
-    } else if (modelFamily === 'nova') {
-      // Amazon Nova format (camelCase in inferenceConfig)
-      requestBody = {
-        schemaVersion: 'messages-v1',
-        messages: [
-          {
-            role: 'user',
-            content: [{ text: prompt }],
-          },
-        ],
-        inferenceConfig: {
-          maxTokens: maxTokens,
-          temperature: temperature,
-        },
-      };
-
-      // Only include topP if it's not the default value of 1.0
-      if (topP !== 1.0) {
-        requestBody.inferenceConfig.topP = topP;
-      }
-
-      Logger.info(
-        `[LLMJudge] Request config: maxTokens=${maxTokens}, temperature=${temperature}, topP=${topP}`
-      );
-    } else if (modelFamily === 'meta') {
-      // Meta Llama format
-      requestBody = {
-        prompt: `<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n${prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n`,
-        max_gen_len: maxTokens,
-        temperature: temperature,
-      };
-
-      if (topP !== 1.0) {
-        requestBody.top_p = topP;
-      }
-
-      Logger.info(
-        `[LLMJudge] Request config: max_gen_len=${maxTokens}, temperature=${temperature}, top_p=${topP}`
-      );
-    } else if (modelFamily === 'qwen' || modelFamily === 'openai' || modelFamily === 'deepseek') {
-      // Qwen, OpenAI GPT-OSS, and DeepSeek use similar message-based format
-      requestBody = {
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        max_tokens: maxTokens,
-        temperature: temperature,
-      };
-
-      if (topP !== 1.0) {
-        requestBody.top_p = topP;
-      }
-
-      Logger.info(
-        `[LLMJudge] Request config: max_tokens=${maxTokens}, temperature=${temperature}, top_p=${topP}`
-      );
-    }
-
-    const command = new InvokeModelCommand({
-      modelId: cleanModelId,
-      body: JSON.stringify(requestBody),
-    });
-
-    const attemptStartTime = Date.now();
+    Logger.info(
+      `[LLMJudge] Request config: maxTokens=${maxTokens}, temperature=${temperature}, topP=${topP}`
+    );
 
     try {
-      Logger.info(`[LLMJudge] Sending InvokeModel request to Bedrock...`);
+      // Build chat request
+      const request: ChatRequest = {
+        model: modelId,
+        messages: [{ role: 'user', content: prompt }],
+        temperature,
+        top_p: topP,
+        max_tokens: maxTokens,
+      };
+
+      Logger.info(`[LLMJudge] Sending request via LLM client...`);
+
+      // Use retry wrapper around client.chat
       const response = await retryWithBackoff(
-        () => this.client.send(command),
+        () => this.client.chat(request),
         3,
         1000,
         'LLMJudge'
       );
-      const attemptLatency = Date.now() - attemptStartTime;
 
-      Logger.info(`[LLMJudge] ✓ Received response from Bedrock`);
-      const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+      Logger.info(`[LLMJudge] ✓ Received response`);
 
-      // Parse response format based on model family
-      let content: string;
-      let inputTokens: number;
-      let outputTokens: number;
-
-      if (modelFamily === 'anthropic') {
-        // Anthropic Claude Messages API format (snake_case)
-        content = responseBody.content?.[0]?.text || '';
-        inputTokens = responseBody.usage?.input_tokens || 0;
-        outputTokens = responseBody.usage?.output_tokens || 0;
-      } else if (modelFamily === 'nova') {
-        // Amazon Nova format (camelCase)
-        content = responseBody.output?.message?.content?.[0]?.text || '';
-        inputTokens = responseBody.usage?.inputTokens || 0;
-        outputTokens = responseBody.usage?.outputTokens || 0;
-      } else if (modelFamily === 'meta') {
-        // Meta Llama format
-        content = responseBody.generation || '';
-        inputTokens = responseBody.prompt_token_count || 0;
-        outputTokens = responseBody.generation_token_count || 0;
-      } else if (modelFamily === 'qwen' || modelFamily === 'openai' || modelFamily === 'deepseek') {
-        // Qwen, OpenAI GPT-OSS, and DeepSeek format
-        content = responseBody.choices?.[0]?.message?.content || '';
-        inputTokens = responseBody.usage?.prompt_tokens || 0;
-        outputTokens = responseBody.usage?.completion_tokens || 0;
-      } else {
-        throw new Error(`[LLMJudge] Unsupported model family for response parsing: ${modelFamily}`);
-      }
+      const { content, usage, latency_ms } = response;
 
       // Accumulate metrics
-      accumulatedMetrics.totalLatency += attemptLatency;
-      accumulatedMetrics.totalInput += inputTokens;
-      accumulatedMetrics.totalOutput += outputTokens;
+      accumulatedMetrics.totalLatency += latency_ms;
+      accumulatedMetrics.totalInput += usage.prompt_tokens;
+      accumulatedMetrics.totalOutput += usage.completion_tokens;
 
       Logger.info(`[LLMJudge] Response length: ${content.length} characters`);
       Logger.info(`[LLMJudge] Parsing JSON from response...`);
@@ -304,7 +170,6 @@ export class LLMJudge {
       Logger.info(`[LLMJudge] ✓ JSON parsed successfully`);
 
       // Pre-processing: Remove attributes with invalid scores (-1, null, undefined)
-      // This handles cases where the LLM returns -1 for "not applicable" instead of omitting the attribute
       const removedAttributes: string[] = [];
       for (const [key, value] of Object.entries(parsed)) {
         if (typeof value === 'object' && value !== null && 'score' in value) {
@@ -336,7 +201,7 @@ export class LLMJudge {
           assessment: validated,
           rawResponse: parsed,
           metrics: {
-            modelId: cleanModelId,
+            modelId: cleanedModelId,
             inputTokens: accumulatedMetrics.totalInput,
             outputTokens: accumulatedMetrics.totalOutput,
             totalTokens: accumulatedMetrics.totalInput + accumulatedMetrics.totalOutput,
@@ -345,9 +210,9 @@ export class LLMJudge {
             attempts: attempt,
             validationPassed: true,
             inferenceConfig: {
-              temperature: temperature,
-              topP: topP,
-              maxTokens: maxTokens,
+              temperature,
+              topP,
+              maxTokens,
             },
           },
           generatedPrompt: promptToReturn,
@@ -370,19 +235,16 @@ export class LLMJudge {
         throw validationError;
       }
     } catch (error) {
-      Logger.error(`[LLMJudge] ✗ Bedrock invocation failed for model ${modelId}`, error);
+      Logger.error(`[LLMJudge] ✗ LLM invocation failed for model ${modelId}`, error);
       throw error;
     }
   }
 
   /**
-   * Destroy the Bedrock client to clean up HTTP connections
-   * Call this when the test runner is done to prevent hanging
+   * Destroy the LLM client to clean up resources
    */
   destroy(): void {
-    if (this.client) {
-      this.client.destroy();
-      Logger.info('[LLMJudge] ✓ Bedrock client destroyed');
-    }
+    this.client.destroy();
+    Logger.info('[LLMJudge] ✓ Client destroyed');
   }
 }

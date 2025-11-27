@@ -1,9 +1,12 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { Logger } from '../utils/logger';
 import { LLMConfig } from '../schemas/config-schema';
 import { applyGeneratorDefaults, ResolvedLLMConfig } from '../utils/llmConfigDefaults';
 import { retryWithBackoff } from '../utils/retry';
+import {
+  ILLMClient,
+  LLMClientFactory,
+  ChatRequest,
+} from '../llm';
 
 export interface LLMGeneratorMetrics {
   modelId: string;
@@ -26,50 +29,26 @@ export interface GenerateResult {
   compiledPrompt: string;
 }
 
+/**
+ * LLM Generator for text generation tasks
+ *
+ * Supports dependency injection for testing:
+ *   const mockClient = new MockAdapter();
+ *   const generator = new LLMGenerator('ap-southeast-2', mockClient);
+ *
+ * Or uses LLMClientFactory for provider switching via env vars:
+ *   LLM_PROVIDER=litellm LITELLM_URL=... npm run test:tenant
+ */
 export class LLMGenerator {
-  private client: BedrockRuntimeClient;
+  private client: ILLMClient;
 
-  constructor(region?: string) {
+  constructor(region?: string, client?: ILLMClient) {
     const resolvedRegion = region || process.env.AWS_REGION || 'ap-southeast-2';
-    this.client = new BedrockRuntimeClient({
-      region: resolvedRegion,
-      requestHandler: new NodeHttpHandler({
-        requestTimeout: 90000, // 90 seconds
-        connectionTimeout: 5000, // 5 seconds to establish connection
-        throwOnRequestTimeout: true, // Convert timeout warning to error for retry
-      }),
-    });
-    Logger.info(`[LLMGenerator] Initialized Bedrock client for region: ${resolvedRegion} (timeout: 90s)`);
-  }
-
-  private getModelFamily(
-    modelId: string
-  ): 'anthropic' | 'nova' | 'meta' | 'qwen' | 'openai' | 'deepseek' {
-    // Remove bedrock: prefix and cross-region prefixes (us., eu., apac., au., etc.)
-    const cleanId = modelId
-      .replace('bedrock:', '')
-      .replace(/^(us|eu|apac|au)\./i, '')
-      .toLowerCase();
-
-    if (cleanId.includes('anthropic') || cleanId.includes('claude')) {
-      return 'anthropic';
-    }
-    if (cleanId.includes('amazon.nova') || cleanId.includes('nova')) {
-      return 'nova';
-    }
-    if (cleanId.includes('meta.llama')) {
-      return 'meta';
-    }
-    if (cleanId.includes('qwen.')) {
-      return 'qwen';
-    }
-    if (cleanId.includes('openai.')) {
-      return 'openai';
-    }
-    if (cleanId.includes('deepseek.')) {
-      return 'deepseek';
-    }
-    throw new Error(`[LLMGenerator] Unsupported model family: ${modelId}`);
+    // Allow injection for testing, otherwise use factory
+    this.client = client || LLMClientFactory.create({ region: resolvedRegion });
+    Logger.info(
+      `[LLMGenerator] Initialized with ${client ? 'injected' : 'factory'} client (region: ${resolvedRegion})`
+    );
   }
 
   async generate(
@@ -91,145 +70,45 @@ export class LLMGenerator {
     const modelId = resolvedConfig.modelId.replace('bedrock:', '');
     Logger.info(`[LLMGenerator] Invoking model: ${modelId}`);
 
-    const startTime = Date.now();
     const timestamp = new Date().toISOString();
 
     try {
-      // Build request body based on model family
-      const modelFamily = this.getModelFamily(resolvedConfig.modelId);
-      let requestBody: any;
+      // Build chat request
+      const request: ChatRequest = {
+        model: resolvedConfig.modelId,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: resolvedConfig.temperature,
+        top_p: resolvedConfig.topP,
+        max_tokens: resolvedConfig.maxTokens,
+      };
 
-      if (modelFamily === 'anthropic') {
-        // Anthropic Claude Messages API format (snake_case)
-        requestBody = {
-          anthropic_version: 'bedrock-2023-05-31',
-          messages: [
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          max_tokens: resolvedConfig.maxTokens,
-          temperature: resolvedConfig.temperature,
-        };
+      Logger.info(`[LLMGenerator] Sending request via LLM client...`);
 
-        // Only include topP if it's not the default value of 1.0
-        if (resolvedConfig.topP !== 1.0) {
-          requestBody.top_p = resolvedConfig.topP;
-        }
-      } else if (modelFamily === 'nova') {
-        // Amazon Nova format (camelCase in inferenceConfig)
-        requestBody = {
-          schemaVersion: 'messages-v1',
-          messages: [
-            {
-              role: 'user',
-              content: [{ text: prompt }],
-            },
-          ],
-          inferenceConfig: {
-            maxTokens: resolvedConfig.maxTokens,
-            temperature: resolvedConfig.temperature,
-          },
-        };
-
-        // Only include topP if it's not the default value of 1.0
-        if (resolvedConfig.topP !== 1.0) {
-          requestBody.inferenceConfig.topP = resolvedConfig.topP;
-        }
-      } else if (modelFamily === 'meta') {
-        // Meta Llama format
-        requestBody = {
-          prompt: `<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n${prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n`,
-          max_gen_len: resolvedConfig.maxTokens,
-          temperature: resolvedConfig.temperature,
-        };
-
-        if (resolvedConfig.topP !== 1.0) {
-          requestBody.top_p = resolvedConfig.topP;
-        }
-      } else if (modelFamily === 'qwen' || modelFamily === 'openai' || modelFamily === 'deepseek') {
-        // Qwen, OpenAI GPT-OSS, and DeepSeek use similar message-based format
-        requestBody = {
-          messages: [
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          max_tokens: resolvedConfig.maxTokens,
-          temperature: resolvedConfig.temperature,
-        };
-
-        if (resolvedConfig.topP !== 1.0) {
-          requestBody.top_p = resolvedConfig.topP;
-        }
-      }
-
-      const command = new InvokeModelCommand({
-        modelId,
-        body: JSON.stringify(requestBody),
-      });
-
-      Logger.info(`[LLMGenerator] Sending request to Bedrock...`);
+      // Use retry wrapper around client.chat
       const response = await retryWithBackoff(
-        () => this.client.send(command),
+        () => this.client.chat(request),
         3,
         1000,
         'LLMGenerator'
       );
-      const latencyMs = Date.now() - startTime;
 
-      const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-
-      // Parse response format based on model family
-      let generatedText: string;
-      let inputTokens: number;
-      let outputTokens: number;
-
-      if (modelFamily === 'anthropic') {
-        // Anthropic Claude Messages API format (snake_case)
-        generatedText = responseBody.content?.[0]?.text || '';
-        inputTokens = responseBody.usage?.input_tokens || 0;
-        outputTokens = responseBody.usage?.output_tokens || 0;
-      } else if (modelFamily === 'nova') {
-        // Amazon Nova format (camelCase)
-        generatedText = responseBody.output?.message?.content?.[0]?.text || '';
-        inputTokens = responseBody.usage?.inputTokens || 0;
-        outputTokens = responseBody.usage?.outputTokens || 0;
-      } else if (modelFamily === 'meta') {
-        // Meta Llama format
-        generatedText = responseBody.generation || '';
-        inputTokens = responseBody.prompt_token_count || 0;
-        outputTokens = responseBody.generation_token_count || 0;
-      } else if (modelFamily === 'qwen' || modelFamily === 'openai' || modelFamily === 'deepseek') {
-        // Qwen, OpenAI GPT-OSS, and DeepSeek format
-        generatedText = responseBody.choices?.[0]?.message?.content || '';
-        inputTokens = responseBody.usage?.prompt_tokens || 0;
-        outputTokens = responseBody.usage?.completion_tokens || 0;
-      } else {
-        throw new Error(
-          `[LLMGenerator] Unsupported model family for response parsing: ${modelFamily}`
-        );
-      }
-
-      const totalTokens = inputTokens + outputTokens;
+      const { content, usage, latency_ms } = response;
 
       Logger.info(`[LLMGenerator] ✓ Generation completed`);
-      Logger.info(`[LLMGenerator] Generated output length: ${generatedText.length} characters`);
+      Logger.info(`[LLMGenerator] Generated output length: ${content.length} characters`);
       Logger.info(
-        `[LLMGenerator] Tokens: ${inputTokens} input, ${outputTokens} output, ${totalTokens} total`
+        `[LLMGenerator] Tokens: ${usage.prompt_tokens} input, ${usage.completion_tokens} output, ${usage.total_tokens} total`
       );
-      Logger.info(`[LLMGenerator] Latency: ${latencyMs}ms`);
+      Logger.info(`[LLMGenerator] Latency: ${latency_ms}ms`);
 
       return {
-        output: generatedText,
+        output: content,
         metrics: {
           modelId,
-          inputTokens,
-          outputTokens,
-          totalTokens,
-          latencyMs,
+          inputTokens: usage.prompt_tokens,
+          outputTokens: usage.completion_tokens,
+          totalTokens: usage.total_tokens,
+          latencyMs: latency_ms,
           timestamp,
           inferenceConfig: {
             temperature: resolvedConfig.temperature,
@@ -259,13 +138,10 @@ export class LLMGenerator {
   }
 
   /**
-   * Destroy the Bedrock client to clean up HTTP connections
-   * Call this when the test runner is done to prevent hanging
+   * Destroy the LLM client to clean up resources
    */
   destroy(): void {
-    if (this.client) {
-      this.client.destroy();
-      Logger.info('[LLMGenerator] ✓ Bedrock client destroyed');
-    }
+    this.client.destroy();
+    Logger.info('[LLMGenerator] ✓ Client destroyed');
   }
 }

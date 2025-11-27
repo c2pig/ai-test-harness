@@ -8,13 +8,13 @@ project:
 testPlan:
   type: text-generation
 
-  prompt: spec-summary-v2-prompt
+  prompt: product-listing
   sampleSize: 40
 
   connectors:
     # Data connector references a connector from config/shared/connectors.yaml
     # The default 'local-example-data' uses local JSON files in local/examples/data-sample/cloudwatch.json
-    logs: local-spec-summary-sources-large
+    logs: local-examples-sources
 
   # LLM configuration for text generation
   llmConfig:

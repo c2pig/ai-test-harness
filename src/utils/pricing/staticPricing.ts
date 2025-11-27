@@ -1,181 +1,113 @@
-// Static fallback pricing sourced from: https://aws.amazon.com/bedrock/pricing/
-// Used when AWS Pricing API is unavailable or as fallback
-// Last updated: 2025-01-21
+/**
+ * Static Pricing Loader
+ *
+ * Loads model pricing from config/shared/pricing.yaml
+ * Used as fallback when AWS Pricing API is unavailable
+ *
+ * Source: https://aws.amazon.com/bedrock/pricing/
+ */
 
+import * as fs from 'fs';
+import * as path from 'path';
+import * as yaml from 'yaml';
 import { ModelPricing } from './types';
+import { PricingConfigSchema } from './pricingSchema';
+import { Logger } from '../logger';
 
-export const STATIC_BEDROCK_PRICING: Record<string, ModelPricing> = {
-  'amazon.nova-micro-v1:0': {
-    inputPer1kTokens: 0.000035, // $0.035 per 1M tokens
-    outputPer1kTokens: 0.00014, // $0.14 per 1M tokens
-  },
-  'amazon.nova-lite-v1:0': {
-    inputPer1kTokens: 0.00006, // $0.06 per 1M tokens
-    outputPer1kTokens: 0.00024, // $0.24 per 1M tokens
-  },
-  'amazon.nova-pro-v1:0': {
-    inputPer1kTokens: 0.0008, // $0.80 per 1M tokens
-    outputPer1kTokens: 0.0032, // $3.20 per 1M tokens
-  },
-  'amazon.nova-pro-latency-optimized-v1:0': {
-    inputPer1kTokens: 0.001, // $1.00 per 1M tokens
-    outputPer1kTokens: 0.004, // $4.00 per 1M tokens
-  },
-  'amazon.nova-premier-v1:0': {
-    inputPer1kTokens: 0.0025, // $2.50 per 1M tokens
-    outputPer1kTokens: 0.0125, // $12.50 per 1M tokens
-  },
+/**
+ * Cached pricing data (loaded once on first access)
+ */
+let cachedPricing: Record<string, ModelPricing> | null = null;
 
-  'anthropic.claude-3-haiku-20240307-v1:0': {
-    inputPer1kTokens: 0.00025, // $0.25 per 1M tokens
-    outputPer1kTokens: 0.00125, // $1.25 per 1M tokens
-  },
-  'anthropic.claude-3-sonnet-20240229-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
-  'anthropic.claude-3-opus-20240229-v1:0': {
-    inputPer1kTokens: 0.015, // $15 per 1M tokens
-    outputPer1kTokens: 0.075, // $75 per 1M tokens
-  },
+/**
+ * Path to pricing configuration file
+ */
+const PRICING_CONFIG_PATH = 'config/shared/pricing.yaml';
 
-  'anthropic.claude-3-5-haiku-20241022-v1:0': {
-    inputPer1kTokens: 0.001, // $1 per 1M tokens
-    outputPer1kTokens: 0.005, // $5 per 1M tokens
-  },
-  'anthropic.claude-3-5-sonnet-20240620-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
-  'anthropic.claude-3-5-sonnet-20241022-v2:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
+/**
+ * Load and validate pricing configuration from YAML file
+ *
+ * @returns Record of model IDs to pricing, or empty object on error
+ */
+function loadPricingConfig(): Record<string, ModelPricing> {
+  // Return cached data if available
+  if (cachedPricing) {
+    return cachedPricing;
+  }
 
-  // Claude 4 and 4.5 models
-  'anthropic.claude-haiku-4-5-20250403-v1:0': {
-    inputPer1kTokens: 0.001, // $1 per 1M tokens
-    outputPer1kTokens: 0.005, // $5 per 1M tokens
-  },
-  'anthropic.claude-sonnet-4-20250514-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
-  'anthropic.claude-sonnet-4-long-context-v1:0': {
-    inputPer1kTokens: 0.006, // $6 per 1M tokens
-    outputPer1kTokens: 0.0225, // $22.50 per 1M tokens
-  },
-  'anthropic.claude-sonnet-4-5-20250929-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
-  'anthropic.claude-sonnet-4-5-long-context-v1:0': {
-    inputPer1kTokens: 0.006, // $6 per 1M tokens
-    outputPer1kTokens: 0.0225, // $22.50 per 1M tokens
-  },
-  'us.anthropic.claude-sonnet-4-5-20250929-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens (cross-region inference)
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
-  'au.anthropic.claude-sonnet-4-5-20250929-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens (cross-region inference)
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
-  'apac.anthropic.claude-sonnet-4-5-20250929-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens (cross-region inference)
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
-  'us.anthropic.claude-sonnet-4-20250514-v1:0': {
-    inputPer1kTokens: 0.003, // $3 per 1M tokens (cross-region inference)
-    outputPer1kTokens: 0.015, // $15 per 1M tokens
-  },
+  const configPath = path.join(process.cwd(), PRICING_CONFIG_PATH);
 
-  'meta.llama3-8b-instruct-v1:0': {
-    inputPer1kTokens: 0.0003, // $0.30 per 1M tokens
-    outputPer1kTokens: 0.0006, // $0.60 per 1M tokens
-  },
-  'meta.llama3-70b-instruct-v1:0': {
-    inputPer1kTokens: 0.00265, // $2.65 per 1M tokens
-    outputPer1kTokens: 0.0035, // $3.50 per 1M tokens
-  },
-  'meta.llama3-1-8b-instruct-v1:0': {
-    inputPer1kTokens: 0.00022, // $0.22 per 1M tokens
-    outputPer1kTokens: 0.00022, // $0.22 per 1M tokens
-  },
-  'meta.llama3-1-70b-instruct-v1:0': {
-    inputPer1kTokens: 0.00099, // $0.99 per 1M tokens
-    outputPer1kTokens: 0.00099, // $0.99 per 1M tokens
-  },
-  'meta.llama3-1-405b-instruct-v1:0': {
-    inputPer1kTokens: 0.00532, // $5.32 per 1M tokens
-    outputPer1kTokens: 0.016, // $16 per 1M tokens
-  },
+  try {
+    // Check if file exists
+    if (!fs.existsSync(configPath)) {
+      Logger.warn(`[Pricing] Config file not found: ${configPath}`);
+      cachedPricing = {};
+      return cachedPricing;
+    }
 
-  // Meta Llama 4 models
-  'meta.llama4-scout-17b-instruct-v1:0': {
-    inputPer1kTokens: 0.00017, // $0.17 per 1M tokens
-    outputPer1kTokens: 0.00066, // $0.66 per 1M tokens
-  },
-  'meta.llama4-maverick-17b-instruct-v1:0': {
-    inputPer1kTokens: 0.00024, // $0.24 per 1M tokens
-    outputPer1kTokens: 0.00097, // $0.97 per 1M tokens
-  },
-  'us.meta.llama4-maverick-17b-instruct-v1:0': {
-    inputPer1kTokens: 0.00024, // $0.24 per 1M tokens (cross-region)
-    outputPer1kTokens: 0.00097, // $0.97 per 1M tokens
-  },
+    // Read and parse YAML
+    const content = fs.readFileSync(configPath, 'utf-8');
+    const parsed = yaml.parse(content);
 
-  // DeepSeek models
-  'deepseek.deepseek-r1-v1:0': {
-    inputPer1kTokens: 0.00135, // $1.35 per 1M tokens
-    outputPer1kTokens: 0.0054, // $5.40 per 1M tokens
-  },
-  'deepseek.v3-v1:0': {
-    inputPer1kTokens: 0.00058, // $0.58 per 1M tokens
-    outputPer1kTokens: 0.00168, // $1.68 per 1M tokens
-  },
-  'us.deepseek.v3-v1:0': {
-    inputPer1kTokens: 0.00058, // $0.58 per 1M tokens (cross-region)
-    outputPer1kTokens: 0.00168, // $1.68 per 1M tokens
-  },
+    // Validate against schema
+    const validated = PricingConfigSchema.parse(parsed);
 
-  // Qwen models
-  'qwen.qwen-coder-30b-a3b-v1:0': {
-    inputPer1kTokens: 0.00015, // $0.15 per 1M tokens
-    outputPer1kTokens: 0.0006, // $0.60 per 1M tokens
-  },
-  'qwen.qwen3-32b-v1:0': {
-    inputPer1kTokens: 0.00015, // $0.15 per 1M tokens
-    outputPer1kTokens: 0.0006, // $0.60 per 1M tokens
-  },
-  'qwen.qwen3-235b-a22b-2507-v1:0': {
-    inputPer1kTokens: 0.00022, // $0.22 per 1M tokens
-    outputPer1kTokens: 0.00088, // $0.88 per 1M tokens
-  },
-  'us.qwen.qwen3-235b-a22b-2507-v1:0': {
-    inputPer1kTokens: 0.00022, // $0.22 per 1M tokens (cross-region)
-    outputPer1kTokens: 0.00088, // $0.88 per 1M tokens
-  },
-  'qwen.qwen-coder-480b-a35b-v1:0': {
-    inputPer1kTokens: 0.00045, // $0.45 per 1M tokens
-    outputPer1kTokens: 0.0018, // $1.80 per 1M tokens
-  },
+    // Cache the result
+    cachedPricing = validated;
 
-  // OpenAI GPT-OSS models
-  'openai.gpt-oss-20b-1:0': {
-    inputPer1kTokens: 0.00007, // $0.07 per 1M tokens
-    outputPer1kTokens: 0.0003, // $0.30 per 1M tokens
-  },
-  'openai.gpt-oss-120b-1:0': {
-    inputPer1kTokens: 0.00015, // $0.15 per 1M tokens
-    outputPer1kTokens: 0.0006, // $0.60 per 1M tokens
-  },
-  'us.openai.gpt-oss-120b-1:0': {
-    inputPer1kTokens: 0.00015, // $0.15 per 1M tokens (cross-region)
-    outputPer1kTokens: 0.0006, // $0.60 per 1M tokens
-  },
-};
+    Logger.info(
+      `[Pricing] ✓ Loaded pricing for ${Object.keys(cachedPricing).length} models from ${PRICING_CONFIG_PATH}`
+    );
 
+    return cachedPricing;
+  } catch (error) {
+    if (error instanceof Error) {
+      Logger.error(`[Pricing] ✗ Failed to load pricing config: ${error.message}`);
+    } else {
+      Logger.error('[Pricing] ✗ Failed to load pricing config', error);
+    }
+
+    // Return empty object as fallback
+    cachedPricing = {};
+    return cachedPricing;
+  }
+}
+
+/**
+ * Get static pricing for a specific model
+ *
+ * @param modelId - The model identifier (e.g., "anthropic.claude-3-5-sonnet-20241022-v2:0")
+ * @returns ModelPricing if found, null otherwise
+ */
 export function getStaticPricing(modelId: string): ModelPricing | null {
-  return STATIC_BEDROCK_PRICING[modelId] || null;
+  const pricing = loadPricingConfig();
+  return pricing[modelId] || null;
+}
+
+/**
+ * Get all available static pricing data
+ *
+ * @returns Record of all model IDs to pricing
+ */
+export function getAllStaticPricing(): Record<string, ModelPricing> {
+  return loadPricingConfig();
+}
+
+/**
+ * Check if static pricing is available for a model
+ *
+ * @param modelId - The model identifier
+ * @returns true if pricing exists
+ */
+export function hasStaticPricing(modelId: string): boolean {
+  const pricing = loadPricingConfig();
+  return modelId in pricing;
+}
+
+/**
+ * Clear the pricing cache (useful for testing or reloading)
+ */
+export function clearPricingCache(): void {
+  cachedPricing = null;
+  Logger.info('[Pricing] Cache cleared');
 }

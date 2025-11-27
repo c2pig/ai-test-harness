@@ -14,7 +14,7 @@ testPlan:
 
   # Data connectors
   connectors:
-    logs: local-product-listing-sources
+    logs: local-examples-sources
     # logs: local-product-listing-sources-difficult  # Removed - source file deleted
 
   # LLM configuration - Array of models for comparison (max 5)
