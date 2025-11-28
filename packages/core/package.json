@@ -1,0 +1,61 @@
+{
+  "name": "@ai-test-harness/core",
+  "version": "1.0.0",
+  "description": "Core framework for AI quality testing",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./llm": {
+      "types": "./dist/llm/index.d.ts",
+      "import": "./dist/llm/index.js"
+    },
+    "./quality": {
+      "types": "./dist/quality-library/index.d.ts",
+      "import": "./dist/quality-library/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "testing",
+    "quality",
+    "bedrock"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-agent": "^3.918.0",
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.600.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.600.0",
+    "@aws-sdk/client-cloudwatch-logs": "^3.600.0",
+    "@aws-sdk/client-dynamodb": "^3.921.0",
+    "@aws-sdk/client-secrets-manager": "^3.600.0",
+    "glob": "^11.0.3",
+    "js-yaml": "^4.1.1",
+    "yaml": "^2.7.0",
+    "jsonpath-plus": "^10.3.0",
+    "pg": "^8.11.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.0",
+    "@types/pg": "^8.10.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+

@@ -1,35 +1,31 @@
 {
-  "name": "ai-test-harness-testing-tools-enhanced",
+  "name": "ai-test-harness",
   "version": "1.0.0",
-  "description": "Multi-tenant AI quality assessment framework",
-  "main": "dist/index.js",
+  "description": "AI Test Harness - Multi-tenant AI quality assessment framework",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\"",
-    "test:demo-profile": "tsx src/index.ts --tenant=examples/demo-profile",
-    "test:demo-profile-multimodel": "tsx src/index.ts --tenant=examples/demo-profile-multimodel",
-    "test:demo-chat-scenario": "tsx src/index.ts --tenant=examples/demo-chat-scenario",
-    "test:demo-chat-evaluation": "tsx src/index.ts --tenant=examples/demo-chat-evaluation",
-    "test:demo-chat-rerun": "tsx src/index.ts --tenant=examples/demo-chat-rerun",
-    "test:demo-chat-simulation": "tsx src/index.ts --tenant=examples/demo-chat-simulation",
-    "create-tenant": "tsx src/cli/create-tenant.ts",
-    "validate": "tsx src/cli/validate-configs.ts && npm run type-check",
-    "schema:version": "tsx src/cli/show-schema-version.ts",
-    "clean:outputs": "find tenants -type d -name 'outputs' -exec rm -rf {} + && echo 'All output folders cleaned'",
-    "chart": "tsx scripts/chart.ts"
+    "build": "npm run build --workspaces",
+    "build:core": "npm run build -w @ai-test-harness/core",
+    "build:cli": "npm run build -w @ai-test-harness/cli",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "lint": "eslint packages --ext .ts",
+    "lint:fix": "eslint packages --ext .ts --fix",
+    "format": "prettier --write \"packages/**/*.ts\"",
+    "format:check": "prettier --check \"packages/**/*.ts\"",
+    "clean:outputs": "find outputs -type d -exec rm -rf {} + 2>/dev/null || true && echo 'Output folders cleaned'"
   },
   "keywords": [
     "ai",
     "quality",
     "testing",
-    "llm"
+    "llm",
+    "bedrock"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-bedrock-agent": "^3.918.0",
     "@aws-sdk/client-bedrock-agent-runtime": "^3.600.0",
@@ -61,5 +57,8 @@
     "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.6.2",
     "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
