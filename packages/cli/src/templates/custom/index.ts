@@ -3,4 +3,3 @@
  */
 
 export { generateExampleQuality } from './example-quality';
-

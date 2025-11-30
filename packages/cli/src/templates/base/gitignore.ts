@@ -27,4 +27,3 @@ outputs/
 cdk.out/
 `;
 }
-

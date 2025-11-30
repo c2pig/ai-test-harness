@@ -39,7 +39,7 @@ export const TransferableSkillsReasoning: QualityAttributeDefinition = {
   },
   examples: {
     rating5:
-      "Fund accountant has APRA reporting + reconciliation → Can transfer to general corporate accounting FULFILLED, but NOT to insolvency accounting UNFULFILLED (domain-specific legal/liquidation knowledge required)",
+      'Fund accountant has APRA reporting + reconciliation → Can transfer to general corporate accounting FULFILLED, but NOT to insolvency accounting UNFULFILLED (domain-specific legal/liquidation knowledge required)',
     rating1:
       "Fund accountant → Can do insolvency accounting because 'both are accounting' (ignores specialization depth)",
   },

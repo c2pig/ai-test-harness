@@ -28,7 +28,11 @@ export async function addCommand(type: string, name: string): Promise<void> {
 
   // Validate name
   if (!name || !/^[a-zA-Z][a-zA-Z0-9-_]*$/.test(name)) {
-    console.error(chalk.red('Error: Name must start with a letter and contain only alphanumeric characters, dashes, or underscores'));
+    console.error(
+      chalk.red(
+        'Error: Name must start with a letter and contain only alphanumeric characters, dashes, or underscores'
+      )
+    );
     process.exit(1);
   }
 
@@ -201,4 +205,3 @@ async function addConnector(name: string): Promise<void> {
   console.log(`  2. Create the data file if using local-json`);
   console.log(`  3. Reference in config.yaml: ${chalk.yellow(`connectors.logs: ${name}`)}\n`);
 }
-

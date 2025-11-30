@@ -29,7 +29,9 @@ export async function getAvailableAttributes(): Promise<string[]> {
  * @param attributeNames - Array of attribute names to validate
  * @returns AttributeValidationResult with invalid attributes
  */
-export async function validateAttributeNames(attributeNames: string[]): Promise<AttributeValidationResult> {
+export async function validateAttributeNames(
+  attributeNames: string[]
+): Promise<AttributeValidationResult> {
   const invalid: string[] = [];
 
   for (const name of attributeNames) {

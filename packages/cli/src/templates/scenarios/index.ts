@@ -3,4 +3,3 @@
  */
 
 export { generateScenarioYaml } from './example-scenario';
-

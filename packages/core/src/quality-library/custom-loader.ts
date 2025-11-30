@@ -43,12 +43,10 @@ export class CustomAttributeLoader {
       );
     }
 
-    let [category, attributeName] = parts;
+    const [rawCategory, attributeName] = parts;
 
     // Normalize "qualities" to "quality" for backward compatibility
-    if (category === 'qualities') {
-      category = 'quality';
-    }
+    const category = rawCategory === 'qualities' ? 'quality' : rawCategory;
 
     return { category, attributeName };
   }
@@ -62,14 +60,18 @@ export class CustomAttributeLoader {
     // Parse path
     const { category, attributeName } = this.parseCustomPath(attributePath);
 
-    Logger.debug(`[CustomAttributeLoader] Loading: ${attributePath} (category=${category}, name=${attributeName})`);
+    Logger.debug(
+      `[CustomAttributeLoader] Loading: ${attributePath} (category=${category}, name=${attributeName})`
+    );
 
     // Build potential file paths (project first, then framework)
     const potentialPaths: string[] = [];
 
     if (this.projectPath) {
       // Check project custom/qualities/ (CLI convention)
-      potentialPaths.push(path.join(this.projectPath, 'custom', 'qualities', `${attributeName}.ts`));
+      potentialPaths.push(
+        path.join(this.projectPath, 'custom', 'qualities', `${attributeName}.ts`)
+      );
       // Check project custom/quality/ (framework convention)
       potentialPaths.push(path.join(this.projectPath, 'custom', 'quality', `${attributeName}.ts`));
     }
@@ -89,7 +91,7 @@ export class CustomAttributeLoader {
     if (!filePath) {
       throw new Error(
         `Custom attribute file not found. Searched:\n` +
-        potentialPaths.map(p => `  - ${p}`).join('\n')
+          potentialPaths.map(p => `  - ${p}`).join('\n')
       );
     }
 

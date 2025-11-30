@@ -106,7 +106,9 @@ export class ConversationToolValidator {
     const passed = errors.length === 0;
 
     if (passed) {
-      Logger.info(`[ConversationToolValidator] ✓ Tool validation passed - all expected tools called`);
+      Logger.info(
+        `[ConversationToolValidator] ✓ Tool validation passed - all expected tools called`
+      );
     } else {
       Logger.warn(`[ConversationToolValidator] ✗ Tool validation failed`);
       errors.forEach(error => Logger.debug(`[ConversationToolValidator]   - ${error}`));
@@ -166,4 +168,3 @@ export class ConversationToolValidator {
     return toolCalls;
   }
 }
-

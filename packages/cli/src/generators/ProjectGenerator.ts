@@ -96,60 +96,34 @@ export class ProjectGenerator {
     );
 
     // config.yaml
-    await fs.writeFile(
-      path.join(this.targetDir, 'config.yaml'),
-      generateConfigYaml(this.config)
-    );
+    await fs.writeFile(path.join(this.targetDir, 'config.yaml'), generateConfigYaml(this.config));
 
     // tsconfig.json
-    await fs.writeJson(
-      path.join(this.targetDir, 'tsconfig.json'),
-      generateTsConfig(),
-      { spaces: 2 }
-    );
+    await fs.writeJson(path.join(this.targetDir, 'tsconfig.json'), generateTsConfig(), {
+      spaces: 2,
+    });
 
     // .gitignore
-    await fs.writeFile(
-      path.join(this.targetDir, '.gitignore'),
-      generateGitignore()
-    );
+    await fs.writeFile(path.join(this.targetDir, '.gitignore'), generateGitignore());
 
     // README.md
-    await fs.writeFile(
-      path.join(this.targetDir, 'README.md'),
-      generateReadme(this.config)
-    );
+    await fs.writeFile(path.join(this.targetDir, 'README.md'), generateReadme(this.config));
   }
 
   private async createSharedConfig(): Promise<void> {
     const sharedDir = path.join(this.targetDir, 'config', 'shared');
 
-    await fs.writeFile(
-      path.join(sharedDir, 'prompts.yaml'),
-      generatePromptsYaml(this.config)
-    );
+    await fs.writeFile(path.join(sharedDir, 'prompts.yaml'), generatePromptsYaml(this.config));
 
-    await fs.writeFile(
-      path.join(sharedDir, 'connectors.yaml'),
-      generateConnectorsYaml()
-    );
+    await fs.writeFile(path.join(sharedDir, 'connectors.yaml'), generateConnectorsYaml());
 
-    await fs.writeFile(
-      path.join(sharedDir, 'agents.yaml'),
-      generateAgentsYaml()
-    );
+    await fs.writeFile(path.join(sharedDir, 'agents.yaml'), generateAgentsYaml());
 
-    await fs.writeFile(
-      path.join(sharedDir, 'pricing.yaml'),
-      generatePricingYaml()
-    );
+    await fs.writeFile(path.join(sharedDir, 'pricing.yaml'), generatePricingYaml());
   }
 
   private async createDataFiles(): Promise<void> {
-    await fs.writeFile(
-      path.join(this.targetDir, 'data', 'prompt.txt'),
-      generatePromptFile()
-    );
+    await fs.writeFile(path.join(this.targetDir, 'data', 'prompt.txt'), generatePromptFile());
 
     await fs.writeJson(
       path.join(this.targetDir, 'data', 'sample-data.json'),
@@ -190,24 +164,15 @@ export class ProjectGenerator {
     );
 
     // tsconfig.json
-    await fs.writeJson(
-      path.join(deployDir, 'tsconfig.json'),
-      generateDeployTsConfig(),
-      { spaces: 2 }
-    );
+    await fs.writeJson(path.join(deployDir, 'tsconfig.json'), generateDeployTsConfig(), {
+      spaces: 2,
+    });
 
     // cdk.json
-    await fs.writeJson(
-      path.join(deployDir, 'cdk.json'),
-      generateCdkJson(),
-      { spaces: 2 }
-    );
+    await fs.writeJson(path.join(deployDir, 'cdk.json'), generateCdkJson(), { spaces: 2 });
 
     // bin/app.ts
-    await fs.writeFile(
-      path.join(deployDir, 'bin', 'app.ts'),
-      generateCdkAppTs(this.config)
-    );
+    await fs.writeFile(path.join(deployDir, 'bin', 'app.ts'), generateCdkAppTs(this.config));
 
     // lib/helpdesk-agent-stack.ts
     await fs.writeFile(
@@ -222,10 +187,7 @@ export class ProjectGenerator {
     );
 
     // README.md
-    await fs.writeFile(
-      path.join(deployDir, 'README.md'),
-      generateDeployReadme(this.config)
-    );
+    await fs.writeFile(path.join(deployDir, 'README.md'), generateDeployReadme(this.config));
   }
 
   /**
@@ -262,4 +224,3 @@ export class ProjectGenerator {
     console.log(`  └── README.md`);
   }
 }
-

@@ -12,8 +12,7 @@ export class PromptLibraryConnector implements IConnector {
   }
 
   async fetch(): Promise<string> {
-    const basePath =
-      this.config.basePath || process.env.PROMPT_LIBRARY_PATH || '../genai-prompts';
+    const basePath = this.config.basePath || process.env.PROMPT_LIBRARY_PATH || '../genai-prompts';
     const fullPath = path.join(basePath, this.config.promptPath);
 
     try {

@@ -74,7 +74,9 @@ export class ConversationEvaluationRunner extends BaseRunner {
       );
       Logger.debug(`[ConversationEvaluationRunner] Agent model: ${agentMetadata.foundationModel}`);
     } catch (error: any) {
-      Logger.error(`[ConversationEvaluationRunner] Failed to retrieve agent metadata: ${error.message}`);
+      Logger.error(
+        `[ConversationEvaluationRunner] Failed to retrieve agent metadata: ${error.message}`
+      );
 
       // Create fallback metadata from config
       agentMetadata = {
@@ -110,7 +112,9 @@ export class ConversationEvaluationRunner extends BaseRunner {
           `- Network connectivity issues\n`
       );
 
-      throw new Error(`Agent metadata retrieval failed. Diagnostic file written to: ${outputDir}/${runTimestamp}/_AGENT_METADATA_ERROR.txt`);
+      throw new Error(
+        `Agent metadata retrieval failed. Diagnostic file written to: ${outputDir}/${runTimestamp}/_AGENT_METADATA_ERROR.txt`
+      );
     }
 
     // Create DynamoDB connector for conversations
@@ -297,7 +301,9 @@ export class ConversationEvaluationRunner extends BaseRunner {
     let scoreCount = 0;
     for (const result of results) {
       if (result.assessment) {
-        const scores = Object.values(result.assessment).map((a: any) => a.score).filter((s: any) => typeof s === 'number');
+        const scores = Object.values(result.assessment)
+          .map((a: any) => a.score)
+          .filter((s: any) => typeof s === 'number');
         totalScore += scores.reduce((sum: number, s: number) => sum + s, 0);
         scoreCount += scores.length;
       }

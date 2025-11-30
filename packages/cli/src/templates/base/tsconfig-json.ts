@@ -17,4 +17,3 @@ export function generateTsConfig(): object {
     include: ['custom/**/*'],
   };
 }
-

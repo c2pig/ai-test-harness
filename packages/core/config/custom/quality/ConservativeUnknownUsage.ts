@@ -9,7 +9,7 @@ export const ConservativeUnknownUsage: QualityAttributeDefinition = {
   name: 'Conservative Unknown Usage',
   weight: 0.6,
   description:
-    "Appropriate use of UNKNOWN status. Should only use UNKNOWN when: (1) candidate profile genuinely lacks information to assess requirement, (2) requirement is ambiguous and multiple interpretations are equally valid, (3) evidence is contradictory. Must NOT use UNKNOWN as a cop-out when clear evidence exists. Overuse of UNKNOWN reduces system utility; underuse creates false confidence.",
+    'Appropriate use of UNKNOWN status. Should only use UNKNOWN when: (1) candidate profile genuinely lacks information to assess requirement, (2) requirement is ambiguous and multiple interpretations are equally valid, (3) evidence is contradictory. Must NOT use UNKNOWN as a cop-out when clear evidence exists. Overuse of UNKNOWN reduces system utility; underuse creates false confidence.',
   rating: {
     '5': {
       label: 'Excellent',

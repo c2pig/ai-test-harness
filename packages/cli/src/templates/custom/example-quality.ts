@@ -55,4 +55,3 @@ export const ResponseClarity = {
 export default ResponseClarity;
 `;
 }
-

@@ -63,7 +63,6 @@ export async function validateCommand(options: ValidateCommandOptions): Promise<
 
     // Print results
     printResults(summary);
-
   } catch (error) {
     spinner.fail('Validation failed');
     console.error(chalk.red(`\nError: ${error instanceof Error ? error.message : String(error)}`));
@@ -71,7 +70,11 @@ export async function validateCommand(options: ValidateCommandOptions): Promise<
   }
 }
 
-function validateMainConfig(projectDir: string, configFile: string, summary: ValidationSummary): void {
+function validateMainConfig(
+  projectDir: string,
+  configFile: string,
+  summary: ValidationSummary
+): void {
   const configPath = path.join(projectDir, configFile);
 
   if (!fs.existsSync(configPath)) {
@@ -82,7 +85,11 @@ function validateMainConfig(projectDir: string, configFile: string, summary: Val
   const result = validateTenantConfig(configPath);
 
   if (result.valid && result.data) {
-    console.log(chalk.green(`  ✓ ${configFile} (schema: ${result.data.schemaVersion}, type: ${result.data.testPlan.type})`));
+    console.log(
+      chalk.green(
+        `  ✓ ${configFile} (schema: ${result.data.schemaVersion}, type: ${result.data.testPlan.type})`
+      )
+    );
   } else {
     console.log(chalk.red(`  ✗ ${configFile} - VALIDATION FAILED`));
     if (result.errors) {
@@ -149,7 +156,8 @@ function validateScenariosDir(projectDir: string, summary: ValidationSummary): v
     return;
   }
 
-  const scenarioFiles = fs.readdirSync(scenariosDir)
+  const scenarioFiles = fs
+    .readdirSync(scenariosDir)
     .filter(f => f.endsWith('.yaml') || f.endsWith('.yml'));
 
   if (scenarioFiles.length === 0) {
@@ -188,7 +196,8 @@ function validateCalibrationDir(projectDir: string, summary: ValidationSummary):
     return;
   }
 
-  const calibrationFiles = fs.readdirSync(calibrationDir)
+  const calibrationFiles = fs
+    .readdirSync(calibrationDir)
     .filter(f => f.endsWith('.yaml') || f.endsWith('.yml'));
 
   if (calibrationFiles.length === 0) {
@@ -204,7 +213,11 @@ function validateCalibrationDir(projectDir: string, summary: ValidationSummary):
 
     if (result.valid && result.data) {
       validCount++;
-      console.log(chalk.green(`  ✓ calibration/${file} (enabled: ${result.data.enabled}, ${result.data.examples?.length || 0} examples)`));
+      console.log(
+        chalk.green(
+          `  ✓ calibration/${file} (enabled: ${result.data.enabled}, ${result.data.examples?.length || 0} examples)`
+        )
+      );
     } else {
       console.log(chalk.red(`  ✗ calibration/${file} - VALIDATION FAILED`));
       if (result.errors) {

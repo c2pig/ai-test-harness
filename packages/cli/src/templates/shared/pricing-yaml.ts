@@ -15,4 +15,3 @@ export function generatePricingYaml(): string {
 #   outputPer1kTokens: 0.002
 `;
 }
-

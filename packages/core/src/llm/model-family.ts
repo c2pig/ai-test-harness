@@ -60,4 +60,3 @@ export function getModelFamily(modelId: string): ModelFamily {
 export function cleanModelId(modelId: string): string {
   return modelId.replace('bedrock:', '');
 }
-

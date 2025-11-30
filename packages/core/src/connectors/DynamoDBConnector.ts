@@ -97,7 +97,9 @@ export class DynamoDBConnector implements IConnector {
     const messageHistory = this.extractMessageHistory(item, schema.messageHistory);
 
     if (index === 0) {
-      Logger.debug(`[DynamoDB] Sample extraction - messageHistory length: ${messageHistory.length}`);
+      Logger.debug(
+        `[DynamoDB] Sample extraction - messageHistory length: ${messageHistory.length}`
+      );
     }
 
     // Extract user messages

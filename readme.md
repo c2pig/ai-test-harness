@@ -1,4 +1,43 @@
-# AI-Test-Harness Test Harness
+# AI Test Harness
+
+[![CI](https://github.com/c2pig/ai-test-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/c2pig/ai-test-harness/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/%40ai-test-harness%2Fcore.svg)](https://www.npmjs.com/package/@ai-test-harness/core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
+
+Multi-tenant AI quality assessment framework for testing and evaluating LLM applications, with first-class support for AWS Bedrock.
+
+## Features
+
+- 🎯 **Multi-tenant testing** - Organize tests by use case or product area
+- 🤖 **AWS Bedrock integration** - Native support for Bedrock models and agents
+- ✅ **Quality assessment** - Built-in framework for evaluating AI outputs
+- 📊 **Data connectors** - CloudWatch, DynamoDB, PostgreSQL integration
+- 🔍 **Schema validation** - Strong typing with Zod schemas
+- 🛠️ **CLI scaffolding** - Interactive tools to create and manage tests
+- 📈 **Flexible evaluation** - Configurable quality attributes and scoring
+
+## Installation
+
+### As a library
+
+```bash
+npm install @ai-test-harness/core
+```
+
+### As a CLI tool
+
+```bash
+npm install -g @ai-test-harness/cli
+```
+
+Or use in your project:
+
+```bash
+npm install --save-dev @ai-test-harness/cli
+```
+
+## Quick Start
 
 Command-line utilities for managing the testing framework. These tools help you create tenants, validate configs, check schema versions, and clean up outputs.
 
@@ -247,3 +286,34 @@ Removes all output folders from tenant directories. Use this to free up disk spa
 ```bash
 npm run clean:outputs
 ```
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Packages
+
+This monorepo contains:
+
+- **[@ai-test-harness/core](./packages/core)** - Core testing framework
+- **[@ai-test-harness/cli](./packages/cli)** - CLI tool for scaffolding and running tests
+
+## Documentation
+
+- [Configuration Schema](./docs/config-schema.md)
+- [Contributing Guide](./CONTRIBUTING.md)
+- [Changelog](./CHANGELOG.md)
+
+## Requirements
+
+- Node.js >= 18.0.0
+- npm >= 8.0.0
+
+## License
+
+[MIT](LICENSE) © AI Test Harness Contributors
+
+## Support
+
+- [GitHub Issues](https://github.com/c2pig/ai-test-harness/issues)
+- [Documentation](https://github.com/c2pig/ai-test-harness#readme)

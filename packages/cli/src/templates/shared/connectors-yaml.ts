@@ -28,4 +28,3 @@ connectors:
   #     output: "$.message.output"
 `;
 }
-

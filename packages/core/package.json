@@ -4,6 +4,12 @@
   "description": "Core framework for AI quality testing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,7 +36,20 @@
     "quality",
     "bedrock"
   ],
+  "author": "AI Test Harness Contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/c2pig/ai-test-harness.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/c2pig/ai-test-harness/issues"
+  },
+  "homepage": "https://github.com/c2pig/ai-test-harness/tree/main/packages/core#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@aws-sdk/client-bedrock-agent": "^3.918.0",
     "@aws-sdk/client-bedrock-agent-runtime": "^3.600.0",

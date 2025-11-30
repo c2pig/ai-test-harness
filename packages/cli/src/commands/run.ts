@@ -49,7 +49,6 @@ export async function runCommand(options: RunCommandOptions): Promise<void> {
       }
 
       console.log(`\n  Output directory: ${chalk.cyan(result.outputDir)}\n`);
-
     } else {
       spinner.fail('Tests failed');
 
@@ -62,11 +61,9 @@ export async function runCommand(options: RunCommandOptions): Promise<void> {
 
       process.exit(1);
     }
-
   } catch (error) {
     spinner.fail('Test execution failed');
     console.error(chalk.red(`\nError: ${error instanceof Error ? error.message : String(error)}`));
     process.exit(1);
   }
 }
-

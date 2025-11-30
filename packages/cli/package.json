@@ -7,6 +7,13 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "type-check": "tsc --noEmit",
@@ -20,7 +27,20 @@
     "scaffold",
     "bedrock"
   ],
+  "author": "AI Test Harness Contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/c2pig/ai-test-harness.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/c2pig/ai-test-harness/issues"
+  },
+  "homepage": "https://github.com/c2pig/ai-test-harness/tree/main/packages/cli#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@ai-test-harness/core": "*",
     "commander": "^12.0.0",

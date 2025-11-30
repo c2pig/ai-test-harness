@@ -21,17 +21,22 @@ import { versionCommand } from '../commands/version';
 
 const program = new Command();
 
-program
-  .name('ai-test-harness')
-  .description('CLI tool for AI quality testing')
-  .version('1.0.0');
+program.name('ai-test-harness').description('CLI tool for AI quality testing').version('1.0.0');
 
 // ai-test-harness new <project-name>
 program
   .command('new <project-name>')
   .description('Create a new AI test project')
-  .option('-t, --template <template>', 'Template to use (default, minimal, agent-simulation)', 'default')
-  .option('--type <type>', 'Test type (text-generation, agent-scenario, agent-simulation)', 'text-generation')
+  .option(
+    '-t, --template <template>',
+    'Template to use (default, minimal, agent-simulation)',
+    'default'
+  )
+  .option(
+    '--type <type>',
+    'Test type (text-generation, agent-scenario, agent-simulation)',
+    'text-generation'
+  )
   .option('-y, --yes', 'Skip prompts and use defaults')
   .action(async (projectName, options) => {
     await newCommand(projectName, options);
@@ -45,7 +50,7 @@ program
   .option('-m, --model <modelId>', 'Override model ID')
   .option('-e, --env <environment>', 'Environment (dev, staging, production)')
   .option('-v, --verbose', 'Verbose output')
-  .action(async (options) => {
+  .action(async options => {
     await runCommand(options);
   });
 
@@ -54,7 +59,7 @@ program
   .command('validate')
   .description('Validate project configuration')
   .option('-c, --config <file>', 'Config file to validate', 'config.yaml')
-  .action(async (options) => {
+  .action(async options => {
     await validateCommand(options);
   });
 
@@ -75,4 +80,3 @@ program
   });
 
 program.parse();
-

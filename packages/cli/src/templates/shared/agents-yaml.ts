@@ -16,4 +16,3 @@ models: {}
   #   region: us-east-2
 `;
 }
-

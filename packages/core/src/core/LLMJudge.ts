@@ -1,11 +1,7 @@
 import { Logger } from '../utils/logger';
 import { retryWithBackoff } from '../utils/retry';
 import { generateAssessmentPrompt, CalibrationExample } from '../quality-library';
-import {
-  ILLMClient,
-  LLMClientFactory,
-  ChatRequest,
-} from '../llm';
+import { ILLMClient, LLMClientFactory, ChatRequest } from '../llm';
 
 export interface LLMJudgeMetrics {
   modelId: string;
@@ -140,12 +136,7 @@ export class LLMJudge {
       Logger.debug(`[LLMJudge] Sending request via LLM client...`);
 
       // Use retry wrapper around client.chat
-      const response = await retryWithBackoff(
-        () => this.client.chat(request),
-        3,
-        1000,
-        'LLMJudge'
-      );
+      const response = await retryWithBackoff(() => this.client.chat(request), 3, 1000, 'LLMJudge');
 
       Logger.info(`[LLMJudge] ✓ Received response`);
 

@@ -1,0 +1,54 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  changeset-check:
+    name: Check for Changeset
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.ref != 'changeset-release/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changeset
+        id: changeset
+        run: |
+          git fetch origin main
+
+          # Check if there are any changeset files in the PR
+          CHANGESET_FILES=$(git diff --name-only origin/main...HEAD | grep -c "^.changeset/.*\.md$" || echo "0")
+
+          # Check if any package files were modified
+          PACKAGE_FILES=$(git diff --name-only origin/main...HEAD | grep -c "^packages/.*/src/" || echo "0")
+
+          if [ "$PACKAGE_FILES" -gt 0 ] && [ "$CHANGESET_FILES" -eq 0 ]; then
+            echo "::warning::No changeset found. If this PR includes user-facing changes, please add a changeset by running 'npm run changeset'"
+          else
+            echo "Changeset check passed"
+          fi
+
+  pr-title-check:
+    name: Check PR Title
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR title format
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            refactor
+            test
+            chore
+            ci
+          requireScope: false

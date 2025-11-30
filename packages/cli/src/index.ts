@@ -9,4 +9,3 @@ export { runCommand } from './commands/run';
 export { validateCommand } from './commands/validate';
 export { addCommand } from './commands/add';
 export { versionCommand } from './commands/version';
-

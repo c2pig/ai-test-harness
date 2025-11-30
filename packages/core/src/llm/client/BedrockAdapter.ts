@@ -40,9 +40,7 @@ export class BedrockAdapter implements ILLMClient {
       }),
     });
 
-    Logger.debug(
-      `[BedrockAdapter] Initialized for region: ${this.region} (timeout: ${timeout}ms)`
-    );
+    Logger.debug(`[BedrockAdapter] Initialized for region: ${this.region} (timeout: ${timeout}ms)`);
   }
 
   /**
@@ -87,9 +85,7 @@ export class BedrockAdapter implements ILLMClient {
       const { content, inputTokens, outputTokens } = parseResponse(modelFamily, responseBody);
 
       Logger.info(`[BedrockAdapter] ✓ Response received (${latencyMs}ms)`);
-      Logger.debug(
-        `[BedrockAdapter] Tokens: ${inputTokens} input, ${outputTokens} output`
-      );
+      Logger.debug(`[BedrockAdapter] Tokens: ${inputTokens} input, ${outputTokens} output`);
 
       return {
         content,
@@ -132,4 +128,3 @@ export class BedrockAdapter implements ILLMClient {
     }
   }
 }
-

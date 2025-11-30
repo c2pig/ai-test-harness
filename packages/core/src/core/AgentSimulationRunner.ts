@@ -68,11 +68,15 @@ export class AgentSimulationRunner extends BaseRunner {
 
     // Validate agent-simulation specific config
     if (!agentConfig) {
-      throw new Error('Missing agent configuration. Please add testPlan.agentConfig or testPlan.agent to your config');
+      throw new Error(
+        'Missing agent configuration. Please add testPlan.agentConfig or testPlan.agent to your config'
+      );
     }
 
     if (!userSimulator) {
-      throw new Error('Missing userSimulator configuration. Please add testPlan.userSimulator to your config');
+      throw new Error(
+        'Missing userSimulator configuration. Please add testPlan.userSimulator to your config'
+      );
     }
 
     if (!scenarios || scenarios.length === 0) {
@@ -84,7 +88,9 @@ export class AgentSimulationRunner extends BaseRunner {
 
     Logger.debug(`[${runnerName}] Agent: ${agentConfig.agentId} (${agentConfig.region})`);
     Logger.debug(`[${runnerName}] User simulator: ${userSimulator.modelId}`);
-    Logger.debug(`[${runnerName}] Max turns: ${conversationControl?.maxTurns || 20}, Scenarios: ${scenarios.length}`);
+    Logger.debug(
+      `[${runnerName}] Max turns: ${conversationControl?.maxTurns || 20}, Scenarios: ${scenarios.length}`
+    );
 
     const outputDir = `./outputs/${tenantName}`;
     const artifactWriter = new ArtifactWriter(outputDir, runTimestamp, 'agent-simulation');
@@ -104,7 +110,9 @@ export class AgentSimulationRunner extends BaseRunner {
       Logger.debug(`[AgentSimulationRunner] Agent model: ${agentMetadata.foundationModel}`);
     } catch (error: any) {
       Logger.error(`[AgentSimulationRunner] Failed to retrieve agent metadata: ${error.message}`);
-      Logger.warn(`[AgentSimulationRunner] Using fallback metadata - test will exit after writing diagnostics`);
+      Logger.warn(
+        `[AgentSimulationRunner] Using fallback metadata - test will exit after writing diagnostics`
+      );
 
       // Create fallback metadata from config
       agentMetadata = {
@@ -140,7 +148,9 @@ export class AgentSimulationRunner extends BaseRunner {
           `- Network connectivity issues\n`
       );
 
-      throw new Error(`Agent metadata retrieval failed. Diagnostic file written to: ${outputDir}/${runTimestamp}/_AGENT_METADATA_ERROR.txt`);
+      throw new Error(
+        `Agent metadata retrieval failed. Diagnostic file written to: ${outputDir}/${runTimestamp}/_AGENT_METADATA_ERROR.txt`
+      );
     }
 
     // Initialize user simulator
@@ -162,14 +172,18 @@ export class AgentSimulationRunner extends BaseRunner {
     // Get batch size from test plan (defaults to 1 for sequential execution)
     const batchSize = testPlan.batchSize || 1;
 
-    Logger.debug(`[AgentSimulationRunner] Processing ${scenarios.length} scenarios (batch size: ${batchSize})`);
+    Logger.debug(
+      `[AgentSimulationRunner] Processing ${scenarios.length} scenarios (batch size: ${batchSize})`
+    );
 
     // Process scenarios in batches
     for (let batchStart = 0; batchStart < scenarios.length; batchStart += batchSize) {
       const batchEnd = Math.min(batchStart + batchSize, scenarios.length);
       const batch = scenarios.slice(batchStart, batchEnd);
 
-      Logger.debug(`[AgentSimulationRunner] Batch ${Math.floor(batchStart / batchSize) + 1}: scenarios ${batchStart + 1}-${batchEnd}`);
+      Logger.debug(
+        `[AgentSimulationRunner] Batch ${Math.floor(batchStart / batchSize) + 1}: scenarios ${batchStart + 1}-${batchEnd}`
+      );
 
       // Process batch in parallel
       const batchPromises = batch.map((scenario, idx) =>
@@ -267,7 +281,9 @@ export class AgentSimulationRunner extends BaseRunner {
     let scoreCount = 0;
     for (const result of results) {
       if (result.assessment) {
-        const scores = Object.values(result.assessment).map((a: any) => a.score).filter((s: any) => typeof s === 'number');
+        const scores = Object.values(result.assessment)
+          .map((a: any) => a.score)
+          .filter((s: any) => typeof s === 'number');
         totalScore += scores.reduce((sum: number, s: number) => sum + s, 0);
         scoreCount += scores.length;
       }
@@ -327,7 +343,9 @@ export class AgentSimulationRunner extends BaseRunner {
     assessment: any;
     validations: any[];
   } | null> {
-    Logger.debug(`[AgentSimulationRunner] Scenario ${scenarioIndex + 1}/${totalScenarios}: ${scenario.scenarioId}`);
+    Logger.debug(
+      `[AgentSimulationRunner] Scenario ${scenarioIndex + 1}/${totalScenarios}: ${scenario.scenarioId}`
+    );
 
     let conversationResult: DynamicConversationResult | undefined;
 
@@ -344,7 +362,9 @@ export class AgentSimulationRunner extends BaseRunner {
         scenarioSessionId // Pass hardcoded sessionId if configured in scenario
       );
 
-      Logger.debug(`[AgentSimulationRunner] Conversation: ${conversationResult.terminationDecision.turnCount} turns, ${conversationResult.totalLatencyMs}ms`);
+      Logger.debug(
+        `[AgentSimulationRunner] Conversation: ${conversationResult.terminationDecision.turnCount} turns, ${conversationResult.totalLatencyMs}ms`
+      );
 
       // Programmatic tool call validation (binary pass/fail)
       let programmaticToolValidation: ExpectedToolCallResult | undefined;
@@ -407,7 +427,9 @@ export class AgentSimulationRunner extends BaseRunner {
           })),
         };
 
-        Logger.debug(`[AgentSimulationRunner] Tool validation: ${validationPassed ? 'PASS' : 'FAIL'}`);
+        Logger.debug(
+          `[AgentSimulationRunner] Tool validation: ${validationPassed ? 'PASS' : 'FAIL'}`
+        );
       }
 
       // Evaluate conversation

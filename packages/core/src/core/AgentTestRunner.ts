@@ -6,10 +6,7 @@ import { ConversationJudge } from './ConversationJudge';
 import { Logger } from '../utils/logger';
 import { ArtifactWriter, BenchmarkMetadata } from '../utils/artifactWriter';
 import { calculateCost } from '../utils/pricing';
-import {
-  ConversationToolValidator,
-  ExpectedToolCallResult,
-} from '../validators';
+import { ConversationToolValidator, ExpectedToolCallResult } from '../validators';
 import { AgentInstructionRetriever, AgentMetadata } from '../utils/AgentInstructionRetriever';
 import { calculatePromptHash } from '../utils/promptHasher';
 import { ValidationRunner } from '../utils/ValidationRunner';
@@ -93,7 +90,9 @@ export class AgentTestRunner extends BaseRunner {
     const expectedToolCalls: any[] = [];
 
     if (!agentConfig) {
-      throw new Error('Agent configuration not found. Please ensure testPlan.agent is configured in config.yaml');
+      throw new Error(
+        'Agent configuration not found. Please ensure testPlan.agent is configured in config.yaml'
+      );
     }
 
     if (!scenarios || scenarios.length === 0) {
@@ -115,7 +114,9 @@ export class AgentTestRunner extends BaseRunner {
     for (let i = 0; i < scenarios.length; i++) {
       const scenario = scenarios[i];
 
-      Logger.debug(`[AgentTestRunner] Scenario ${i + 1}/${scenarios.length}: ${scenario.scenarioId}`);
+      Logger.debug(
+        `[AgentTestRunner] Scenario ${i + 1}/${scenarios.length}: ${scenario.scenarioId}`
+      );
       Logger.debug(`[AgentTestRunner] Description: ${scenario.description}`);
 
       // Declare conversation outside try block so it's accessible in catch
@@ -151,12 +152,16 @@ export class AgentTestRunner extends BaseRunner {
           contextData
         );
 
-        Logger.debug(`[AgentTestRunner] Conversation: ${conversation.turns.length} turns, ${conversation.totalLatencyMs}ms`);
+        Logger.debug(
+          `[AgentTestRunner] Conversation: ${conversation.turns.length} turns, ${conversation.totalLatencyMs}ms`
+        );
 
         // Validate tool calls (programmatic validation from config.expectedToolCalls)
         let programmaticToolValidation: ExpectedToolCallResult | undefined;
         if (expectedToolCalls.length > 0) {
-          Logger.debug(`[AgentTestRunner] Validating ${expectedToolCalls.length} expected tool calls`);
+          Logger.debug(
+            `[AgentTestRunner] Validating ${expectedToolCalls.length} expected tool calls`
+          );
 
           // Extract actual tool names from conversation
           const actualToolNames: string[] = [];
@@ -223,7 +228,9 @@ export class AgentTestRunner extends BaseRunner {
           };
 
           if (!programmaticToolValidation.validationPassed) {
-            Logger.warn(`[AgentTestRunner] Tool validation failed: missing=${missingToolCalls.join(',')}, unexpected=${unexpectedToolCalls.join(',')}`);
+            Logger.warn(
+              `[AgentTestRunner] Tool validation failed: missing=${missingToolCalls.join(',')}, unexpected=${unexpectedToolCalls.join(',')}`
+            );
           }
         }
 
@@ -235,7 +242,9 @@ export class AgentTestRunner extends BaseRunner {
         );
 
         if (!toolValidation.passed) {
-          Logger.warn(`[AgentTestRunner] Tool validation failed: ${toolValidation.errors.join('; ')}`);
+          Logger.warn(
+            `[AgentTestRunner] Tool validation failed: ${toolValidation.errors.join('; ')}`
+          );
         } else if (toolValidation.warnings.length > 0) {
           Logger.debug(`[AgentTestRunner] Tool warnings: ${toolValidation.warnings.join('; ')}`);
         }
@@ -389,7 +398,9 @@ export class AgentTestRunner extends BaseRunner {
     let scoreCount = 0;
     for (const result of results) {
       if (result.assessment) {
-        const scores = Object.values(result.assessment).map((a: any) => a.score).filter((s: any) => typeof s === 'number');
+        const scores = Object.values(result.assessment)
+          .map((a: any) => a.score)
+          .filter((s: any) => typeof s === 'number');
         totalScore += scores.reduce((sum: number, s: number) => sum + s, 0);
         scoreCount += scores.length;
       }

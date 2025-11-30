@@ -35,4 +35,3 @@ export interface LLMResponse {
   inputTokens: number;
   outputTokens: number;
 }
-

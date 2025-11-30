@@ -25,4 +25,3 @@ export const PricingConfigSchema = z.record(z.string(), ModelPricingSchema);
  */
 export type ModelPricingConfig = z.infer<typeof ModelPricingSchema>;
 export type PricingConfig = z.infer<typeof PricingConfigSchema>;
-

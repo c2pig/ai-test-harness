@@ -38,4 +38,3 @@ examples:
       CleanOutput: 2
 `;
 }
-

@@ -54,7 +54,10 @@ export async function newCommand(projectName: string, options: NewCommandOptions
   }
 }
 
-async function gatherConfig(projectName: string, options: NewCommandOptions): Promise<ProjectConfig> {
+async function gatherConfig(
+  projectName: string,
+  options: NewCommandOptions
+): Promise<ProjectConfig> {
   if (options.yes) {
     const isAgentType = options.type === 'agent-scenario' || options.type === 'agent-simulation';
     return {
@@ -88,7 +91,8 @@ async function gatherConfig(projectName: string, options: NewCommandOptions): Pr
     },
   ]);
 
-  const isAgentType = typeAnswer.testType === 'agent-scenario' || typeAnswer.testType === 'agent-simulation';
+  const isAgentType =
+    typeAnswer.testType === 'agent-scenario' || typeAnswer.testType === 'agent-simulation';
 
   // Build prompts based on test type
   const modelPrompts: any[] = [];
@@ -146,7 +150,9 @@ function printNextSteps(projectName: string, config: ProjectConfig): void {
     console.log(chalk.bold('  🚀 To deploy the Bedrock Agent:\n'));
     console.log(`  1. ${chalk.cyan(`cd ${projectName}/deploy`)}`);
     console.log(`  2. ${chalk.cyan('npm install')}`);
-    console.log(`  3. ${chalk.cyan('AWS_DEFAULT_REGION=us-east-2 npx cdk bootstrap')} (first time only)`);
+    console.log(
+      `  3. ${chalk.cyan('AWS_DEFAULT_REGION=us-east-2 npx cdk bootstrap')} (first time only)`
+    );
     console.log(`  4. ${chalk.cyan('AWS_DEFAULT_REGION=us-east-2 npx cdk deploy')}`);
     console.log(`  5. Update config/shared/agents.yaml with output values\n`);
     console.log(chalk.dim('  See deploy/README.md for detailed instructions\n'));

@@ -291,7 +291,9 @@ export class TestRunner extends BaseRunner {
     let scoreCount = 0;
     for (const result of results) {
       if (result.assessment) {
-        const scores = Object.values(result.assessment).map((a: any) => a.score).filter((s: any) => typeof s === 'number');
+        const scores = Object.values(result.assessment)
+          .map((a: any) => a.score)
+          .filter((s: any) => typeof s === 'number');
         totalScore += scores.reduce((sum: number, s: number) => sum + s, 0);
         scoreCount += scores.length;
       }

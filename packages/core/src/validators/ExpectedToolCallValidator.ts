@@ -47,7 +47,9 @@ export class ExpectedToolCallValidator {
   validate(
     actualToolCalls: { toolName: string; parameters: Record<string, any> }[]
   ): ExpectedToolCallResult {
-    Logger.debug(`[ExpectedToolCallValidator] Validating ${actualToolCalls.length} actual tool calls`);
+    Logger.debug(
+      `[ExpectedToolCallValidator] Validating ${actualToolCalls.length} actual tool calls`
+    );
 
     const expectedToolCallsFound: string[] = [];
     const unexpectedToolCalls: string[] = [];
@@ -92,7 +94,9 @@ export class ExpectedToolCallValidator {
           parameterMatch,
         });
 
-        Logger.info(`[ExpectedToolCallValidator] ✓ Expected tool call found: ${actualCall.toolName}`);
+        Logger.info(
+          `[ExpectedToolCallValidator] ✓ Expected tool call found: ${actualCall.toolName}`
+        );
       } else {
         // Unexpected call
         unexpectedToolCalls.push(actualCall.toolName);
@@ -118,7 +122,9 @@ export class ExpectedToolCallValidator {
       unexpectedToolCalls.length === 0 &&
       details.every(d => d.parameterMatch !== false);
 
-    Logger.debug(`[ExpectedToolCallValidator] Validation ${validationPassed ? 'PASSED' : 'FAILED'}`);
+    Logger.debug(
+      `[ExpectedToolCallValidator] Validation ${validationPassed ? 'PASSED' : 'FAILED'}`
+    );
 
     return {
       expectedToolCallsFound,
@@ -184,4 +190,3 @@ export class ExpectedToolCallValidator {
     return toolCalls;
   }
 }
-

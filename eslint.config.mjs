@@ -8,13 +8,12 @@ export default [
   js.configs.recommended,
   prettierConfig,
   {
-    files: ['src/**/*.ts'],
+    files: ['packages/*/src/**/*.ts'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
         ecmaVersion: 2021,
         sourceType: 'module',
-        project: './tsconfig.json',
       },
       globals: {
         console: 'readonly',
@@ -24,6 +23,7 @@ export default [
         fetch: 'readonly',
         setTimeout: 'readonly',
         TextDecoder: 'readonly',
+        AbortSignal: 'readonly',
       },
     },
     plugins: {
@@ -58,12 +58,21 @@ export default [
   },
   {
     ignores: [
-      'node_modules/',
-      'dist/',
-      'outputs/',
+      '**/node_modules/',
+      '**/dist/',
+      '**/outputs/',
+      '**/*.d.ts',
       '**/*.js',
       '**/*.mjs',
       '!eslint.config.mjs',
+      '.changeset/',
+      'tenants/',
+      'config/',
+      'docs/',
+      'examples/',
+      'local/',
+      'scripts/',
+      'packages/*/config/',
     ],
   },
 ];

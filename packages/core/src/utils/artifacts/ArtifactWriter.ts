@@ -75,7 +75,11 @@ export class ArtifactWriter {
     // Write input sources
     const inputSourcesPath = path.join(matchDir, `1-input-sources-to-${typePrefix}.yaml`);
     const inputData = { scenarioId: artifact.recommendationId, ...artifact.inputs };
-    fs.writeFileSync(inputSourcesPath, yaml.dump(inputData, { lineWidth: -1, noRefs: true }), 'utf-8');
+    fs.writeFileSync(
+      inputSourcesPath,
+      yaml.dump(inputData, { lineWidth: -1, noRefs: true }),
+      'utf-8'
+    );
 
     // Write generated output
     const generatedOutputPath = path.join(matchDir, `2-${typePrefix}-generated-output.yaml`);
@@ -84,13 +88,24 @@ export class ArtifactWriter {
       rawOutput: artifact.rawOutput,
       generatedOutput: artifact.generatedOutput,
     };
-    fs.writeFileSync(generatedOutputPath, yaml.dump(outputData, { lineWidth: -1, noRefs: true }), 'utf-8');
+    fs.writeFileSync(
+      generatedOutputPath,
+      yaml.dump(outputData, { lineWidth: -1, noRefs: true }),
+      'utf-8'
+    );
 
     // Write judge prompt (only if provided)
     if (artifact.judgePrompt) {
       const judgePromptPath = path.join(matchDir, '3-judge-prompt.yaml');
-      const promptData = { scenarioId: artifact.recommendationId, judgePrompt: artifact.judgePrompt };
-      fs.writeFileSync(judgePromptPath, yaml.dump(promptData, { lineWidth: -1, noRefs: true }), 'utf-8');
+      const promptData = {
+        scenarioId: artifact.recommendationId,
+        judgePrompt: artifact.judgePrompt,
+      };
+      fs.writeFileSync(
+        judgePromptPath,
+        yaml.dump(promptData, { lineWidth: -1, noRefs: true }),
+        'utf-8'
+      );
     }
 
     // Write judge evaluation
@@ -109,7 +124,11 @@ export class ArtifactWriter {
       }
     }
 
-    fs.writeFileSync(judgeEvaluationPath, yaml.dump(judgeData, { lineWidth: -1, noRefs: true }), 'utf-8');
+    fs.writeFileSync(
+      judgeEvaluationPath,
+      yaml.dump(judgeData, { lineWidth: -1, noRefs: true }),
+      'utf-8'
+    );
 
     // Write reporting summary markdown
     const summaryPath = path.join(matchDir, '5-reporting-summary.md');
@@ -124,7 +143,11 @@ export class ArtifactWriter {
       ...artifact.llmStats,
       total: { ...artifact.llmStats.total, costBreakdown },
     };
-    fs.writeFileSync(llmTracePath, yaml.dump(llmStatsWithBreakdown, { lineWidth: -1, noRefs: true }), 'utf-8');
+    fs.writeFileSync(
+      llmTracePath,
+      yaml.dump(llmStatsWithBreakdown, { lineWidth: -1, noRefs: true }),
+      'utf-8'
+    );
 
     Logger.info(`[ArtifactWriter] ✓ Artifact written: ${matchDir}`);
   }
@@ -147,7 +170,11 @@ export class ArtifactWriter {
     // Write shared inputs (only once per test)
     const sharedInputsPath = path.join(matchDir, '1-shared-inputs.yaml');
     if (!fs.existsSync(sharedInputsPath)) {
-      fs.writeFileSync(sharedInputsPath, yaml.dump(artifact.inputs, { lineWidth: -1, noRefs: true }), 'utf-8');
+      fs.writeFileSync(
+        sharedInputsPath,
+        yaml.dump(artifact.inputs, { lineWidth: -1, noRefs: true }),
+        'utf-8'
+      );
     }
 
     // Write combined generated output + model info
@@ -162,12 +189,20 @@ export class ArtifactWriter {
       rawOutput: artifact.rawOutput,
       generatedOutput: artifact.generatedOutput,
     };
-    fs.writeFileSync(generatedOutputPath, yaml.dump(outputData, { lineWidth: -1, noRefs: true }), 'utf-8');
+    fs.writeFileSync(
+      generatedOutputPath,
+      yaml.dump(outputData, { lineWidth: -1, noRefs: true }),
+      'utf-8'
+    );
 
     // Write judge prompt (only if provided)
     if (artifact.judgePrompt) {
       const judgePromptPath = path.join(modelDir, '3-judge-prompt.yaml');
-      fs.writeFileSync(judgePromptPath, yaml.dump({ judgePrompt: artifact.judgePrompt }, { lineWidth: -1, noRefs: true }), 'utf-8');
+      fs.writeFileSync(
+        judgePromptPath,
+        yaml.dump({ judgePrompt: artifact.judgePrompt }, { lineWidth: -1, noRefs: true }),
+        'utf-8'
+      );
     }
 
     // Write judge evaluation
@@ -184,13 +219,24 @@ export class ArtifactWriter {
         judgeData.overallQuality.overall = artifact.scoreBreakdown.overall;
       }
     }
-    fs.writeFileSync(judgeEvaluationPath, yaml.dump(judgeData, { lineWidth: -1, noRefs: true }), 'utf-8');
+    fs.writeFileSync(
+      judgeEvaluationPath,
+      yaml.dump(judgeData, { lineWidth: -1, noRefs: true }),
+      'utf-8'
+    );
 
     // Write LLM trace with cost breakdown
     const llmTracePath = path.join(modelDir, '5-llm-trace.yaml');
     const costBreakdown = await this.calculateCostBreakdown(artifact);
-    const llmStatsWithBreakdown = { ...artifact.llmStats, total: { ...artifact.llmStats.total, costBreakdown } };
-    fs.writeFileSync(llmTracePath, yaml.dump(llmStatsWithBreakdown, { lineWidth: -1, noRefs: true }), 'utf-8');
+    const llmStatsWithBreakdown = {
+      ...artifact.llmStats,
+      total: { ...artifact.llmStats.total, costBreakdown },
+    };
+    fs.writeFileSync(
+      llmTracePath,
+      yaml.dump(llmStatsWithBreakdown, { lineWidth: -1, noRefs: true }),
+      'utf-8'
+    );
 
     Logger.info(`[ArtifactWriter] ✓ Multi-model artifact written: ${modelDir}`);
   }
@@ -229,12 +275,14 @@ export class ArtifactWriter {
 
     const lines: string[] = [];
     lines.push(`# Multi-Model Comparison: ${recommendationId}`, '', '## Models Compared', '');
-    
+
     modelResults.forEach((r, idx) => {
       lines.push(`- **${r.modelAlias}**: \`${r.modelConfig.modelId}\``);
-      if (r.modelConfig.temperature !== undefined) lines.push(`  - Temperature: ${r.modelConfig.temperature}`);
+      if (r.modelConfig.temperature !== undefined)
+        lines.push(`  - Temperature: ${r.modelConfig.temperature}`);
       if (r.modelConfig.topP !== undefined) lines.push(`  - Top-P: ${r.modelConfig.topP}`);
-      if (r.modelConfig.maxTokens !== undefined) lines.push(`  - Max Tokens: ${r.modelConfig.maxTokens}`);
+      if (r.modelConfig.maxTokens !== undefined)
+        lines.push(`  - Max Tokens: ${r.modelConfig.maxTokens}`);
       lines.push(`  - Task Cost: $${taskCosts[idx].toFixed(6)}`, `  - Latency: ${r.latencyMs}ms`);
     });
     lines.push('');
@@ -258,8 +306,11 @@ export class ArtifactWriter {
     // Average scores
     lines.push('## Average Scores', '');
     modelResults.forEach(r => {
-      const scores = Object.values(r.assessment || {}).map((v: any) => v.score).filter(s => s !== undefined);
-      const avgScore = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : 'N/A';
+      const scores = Object.values(r.assessment || {})
+        .map((v: any) => v.score)
+        .filter(s => s !== undefined);
+      const avgScore =
+        scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : 'N/A';
       lines.push(`- **${r.modelAlias}**: ${avgScore}`);
     });
     lines.push('');
@@ -268,10 +319,14 @@ export class ArtifactWriter {
     lines.push('## Cost Efficiency', '');
     lines.push('*Note: Comparison uses task LLM costs only for fair model comparison.*', '');
     modelResults.forEach((r, idx) => {
-      const scores = Object.values(r.assessment || {}).map((v: any) => v.score).filter(s => s !== undefined);
+      const scores = Object.values(r.assessment || {})
+        .map((v: any) => v.score)
+        .filter(s => s !== undefined);
       const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
       const costEfficiency = avgScore > 0 ? (avgScore / taskCosts[idx]).toFixed(0) : '0';
-      lines.push(`- **${r.modelAlias}**: ${costEfficiency} quality-points per dollar (task cost: $${taskCosts[idx].toFixed(4)})`);
+      lines.push(
+        `- **${r.modelAlias}**: ${costEfficiency} quality-points per dollar (task cost: $${taskCosts[idx].toFixed(4)})`
+      );
     });
     lines.push('');
 
@@ -292,7 +347,11 @@ export class ArtifactWriter {
     Logger.info(`[ArtifactWriter] ✓ Comparison summary written: ${summaryPath}`);
   }
 
-  private detectLambdaErrors(artifact: TestArtifact): { hasErrors: boolean; errorCount: number; turns: number[] } {
+  private detectLambdaErrors(artifact: TestArtifact): {
+    hasErrors: boolean;
+    errorCount: number;
+    turns: number[];
+  } {
     const errors = { hasErrors: false, errorCount: 0, turns: [] as number[] };
     if (artifact.conversationMetadata?.turns) {
       for (const turn of artifact.conversationMetadata.turns) {
@@ -340,7 +399,9 @@ export class ArtifactWriter {
 
 **Timestamp:** ${artifact.timestamp}
 
-${lambdaErrors.hasErrors ? `
+${
+  lambdaErrors.hasErrors
+    ? `
 ---
 
 ⚠️ **LAMBDA EXECUTION ERRORS DETECTED**
@@ -351,7 +412,9 @@ ${lambdaErrors.hasErrors ? `
 - **Impact:** Agent received mock responses; conversation quality assessment may be affected
 
 ---
-` : '---'}
+`
+    : '---'
+}
 
 ## 📂 Artifact Files
 
@@ -363,22 +426,37 @@ ${lambdaErrors.hasErrors ? `
 - **\`6-llm-trace.yaml\`** - Token usage, latency, trace metrics, and cost
 
 ---
-${artifact.scoreBreakdown ? `
+${
+  artifact.scoreBreakdown
+    ? `
 ## 📊 Overall Quality
 
-${artifact.scoreBreakdown.byCategory ? Object.entries(artifact.scoreBreakdown.byCategory)
-  .map(([category, scores]: [string, any]) => `
+${
+  artifact.scoreBreakdown.byCategory
+    ? Object.entries(artifact.scoreBreakdown.byCategory)
+        .map(
+          ([category, scores]: [string, any]) => `
 ### ${category.charAt(0).toUpperCase() + category.slice(1)} Quality
 **Weighted Average:** ${scores.weightedAverage}/5.0
 **Simple Average:** ${scores.average}/5.0
-`).join('\n') : ''}
-${artifact.scoreBreakdown.overall ? `
+`
+        )
+        .join('\n')
+    : ''
+}
+${
+  artifact.scoreBreakdown.overall
+    ? `
 ### Overall
 **Weighted Average:** ${artifact.scoreBreakdown.overall.weightedAverage}/5.0
 **Simple Average:** ${artifact.scoreBreakdown.overall.average}/5.0
-` : ''}
+`
+    : ''
+}
 ---
-` : ''}
+`
+    : ''
+}
 ## 💰 Cost Breakdown
 
 **Total Cost:** $${artifact.llmStats.total.estimatedCostUSD.toFixed(4)}
@@ -393,7 +471,9 @@ ${artifact.scoreBreakdown.overall ? `
 ${this.formatAssessmentSummary(artifact.assessment)}
 
 ---
-${artifact.assessment && typeof artifact.assessment === 'object' ? `
+${
+  artifact.assessment && typeof artifact.assessment === 'object'
+    ? `
 ## 📈 All Attributes
 
 | Attribute | Score | Weight | Contribution | Status |
@@ -403,7 +483,9 @@ ${this.formatAttributeTable(artifact.assessment)}
 **Status:** ✓ Score ≥4 | ⚠ Score 3 or lower | ⊘ Not applicable
 
 ---
-` : ''}
+`
+    : ''
+}
 *View detailed files in this directory for complete test data.*
 `;
   }
@@ -412,16 +494,19 @@ ${this.formatAttributeTable(artifact.assessment)}
     const entries = Object.entries(assessment) as Array<[string, any]>;
     const sorted = entries.sort((a, b) => (b[1].weight ?? 0) - (a[1].weight ?? 0));
 
-    return sorted.map(([attr, data]) => {
-      if (data.score === null || data.score === undefined) {
-        return `| ${attr} | N/A | ${data.weight ? Math.round(data.weight * 100) + '%' : 'N/A'} | -- | ⊘ |`;
-      }
-      const score = `${data.score}/5`;
-      const weight = data.weight !== undefined ? Math.round(data.weight * 100) + '%' : 'N/A';
-      const contribution = data.weightedScore !== undefined ? data.weightedScore.toFixed(2) : 'N/A';
-      const status = data.score >= 4 ? '✓' : '⚠';
-      return `| ${attr} | ${score} | ${weight} | ${contribution} | ${status} |`;
-    }).join('\n');
+    return sorted
+      .map(([attr, data]) => {
+        if (data.score === null || data.score === undefined) {
+          return `| ${attr} | N/A | ${data.weight ? Math.round(data.weight * 100) + '%' : 'N/A'} | -- | ⊘ |`;
+        }
+        const score = `${data.score}/5`;
+        const weight = data.weight !== undefined ? Math.round(data.weight * 100) + '%' : 'N/A';
+        const contribution =
+          data.weightedScore !== undefined ? data.weightedScore.toFixed(2) : 'N/A';
+        const status = data.score >= 4 ? '✓' : '⚠';
+        return `| ${attr} | ${score} | ${weight} | ${contribution} | ${status} |`;
+      })
+      .join('\n');
   }
 
   private formatAssessmentSummary(assessment: any): string {
@@ -512,13 +597,20 @@ ${this.formatAttributeTable(artifact.assessment)}
     Logger.info(`[ArtifactWriter] ✓ Summary written: ${filepath}`);
   }
 
-  private async writeMultiModelSummary(results: any[], runTimestamp: string, filepath: string): Promise<void> {
+  private async writeMultiModelSummary(
+    results: any[],
+    runTimestamp: string,
+    filepath: string
+  ): Promise<void> {
     const totalCost = results.reduce((sum, r) => sum + (r.cost || 0), 0);
     const firstTest = results[0] || {};
 
     const testGroups: Map<string, any[]> = new Map();
     results.forEach(r => {
-      const baseMatchId = String(r.recommendationId).replace(/-(?:sonnet|nova|llama|mistral|gpt|model)-[^-]+$/, '');
+      const baseMatchId = String(r.recommendationId).replace(
+        /-(?:sonnet|nova|llama|mistral|gpt|model)-[^-]+$/,
+        ''
+      );
       if (!testGroups.has(baseMatchId)) testGroups.set(baseMatchId, []);
       testGroups.get(baseMatchId)!.push(r);
     });
@@ -554,7 +646,11 @@ ${this.formatAttributeTable(artifact.assessment)}
             }, {}),
           };
         });
-        return { recommendationId: baseMatchId, jobId: modelResults[0].jobId, models: perModelResults };
+        return {
+          recommendationId: baseMatchId,
+          jobId: modelResults[0].jobId,
+          models: perModelResults,
+        };
       }),
       aggregated: {
         overall: this.calculateAggregates(results),
@@ -575,7 +671,10 @@ ${this.formatAttributeTable(artifact.assessment)}
       Object.keys(result.assessment || {}).forEach(cap => allCapabilities.add(cap));
     });
 
-    const aggregated: Record<string, { avgScore: number; evaluatedTests: number; omittedTests: number }> = {};
+    const aggregated: Record<
+      string,
+      { avgScore: number; evaluatedTests: number; omittedTests: number }
+    > = {};
 
     allCapabilities.forEach(cap => {
       let total = 0;
@@ -602,4 +701,3 @@ ${this.formatAttributeTable(artifact.assessment)}
     return aggregated;
   }
 }
-

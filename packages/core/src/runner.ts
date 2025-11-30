@@ -94,11 +94,11 @@ export async function runTests(options: RunTestsOptions = {}): Promise<RunTestsR
   // Run tests - Use runWithConfig for external projects
   // This bypasses the tenant path resolution in BaseRunner.run()
   const originalCwd = process.cwd();
-  
+
   try {
     // Change to project directory so relative paths work
     process.chdir(projectPath);
-    
+
     // Use runWithConfig which accepts pre-loaded config
     // projectName is used for output directory naming
     const result = await runner.runWithConfig(path.basename(projectPath), config);
@@ -318,9 +318,9 @@ export async function validateProject(projectPath: string): Promise<ValidationRe
   // 6. Validate data files
   const dataPath = path.join(projectPath, 'data');
   if (fs.existsSync(dataPath)) {
-    const dataFiles = fs.readdirSync(dataPath).filter(f =>
-      f.endsWith('.json') || f.endsWith('.yaml') || f.endsWith('.txt')
-    );
+    const dataFiles = fs
+      .readdirSync(dataPath)
+      .filter(f => f.endsWith('.json') || f.endsWith('.yaml') || f.endsWith('.txt'));
     details.data = { valid: true, count: dataFiles.length };
     if (dataFiles.length === 0) {
       warnings.push('data/ directory has no data files');
@@ -342,4 +342,3 @@ export async function validateProject(projectPath: string): Promise<ValidationRe
     details,
   };
 }
-

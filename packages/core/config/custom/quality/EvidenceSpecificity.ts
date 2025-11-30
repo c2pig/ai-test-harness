@@ -9,7 +9,7 @@ export const EvidenceSpecificity: QualityAttributeDefinition = {
   name: 'Evidence Specificity',
   weight: 0.7,
   description:
-    "Level of detail required to mark requirement as FULFILLED. Must distinguish between: (1) explicit evidence (directly states requirement), (2) strong implicit evidence (clearly demonstrates capability through specific examples), (3) weak implicit evidence (vague or tangential), (4) no evidence. Should require explicit or strong implicit evidence for FULFILLED. Weak evidence should trigger UNKNOWN or UNFULFILLED depending on context.",
+    'Level of detail required to mark requirement as FULFILLED. Must distinguish between: (1) explicit evidence (directly states requirement), (2) strong implicit evidence (clearly demonstrates capability through specific examples), (3) weak implicit evidence (vague or tangential), (4) no evidence. Should require explicit or strong implicit evidence for FULFILLED. Weak evidence should trigger UNKNOWN or UNFULFILLED depending on context.',
   rating: {
     '5': {
       label: 'Excellent',

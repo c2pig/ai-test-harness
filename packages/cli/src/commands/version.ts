@@ -19,8 +19,9 @@ export async function versionCommand(): Promise<void> {
   console.log('Supported Versions:');
   SUPPORTED_SCHEMA_VERSIONS.forEach((version: string) => {
     const isCurrent = version === CURRENT_SCHEMA_VERSION;
-    console.log(`  ${isCurrent ? chalk.green('→') : ' '} ${version}${isCurrent ? chalk.dim(' (current)') : ''}`);
+    console.log(
+      `  ${isCurrent ? chalk.green('→') : ' '} ${version}${isCurrent ? chalk.dim(' (current)') : ''}`
+    );
   });
   console.log('');
 }
-

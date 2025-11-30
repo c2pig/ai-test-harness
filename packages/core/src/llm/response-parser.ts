@@ -95,4 +95,3 @@ function parseOpenAICompatibleResponse(body: Record<string, unknown>): LLMRespon
     outputTokens: usage?.completion_tokens || 0,
   };
 }
-

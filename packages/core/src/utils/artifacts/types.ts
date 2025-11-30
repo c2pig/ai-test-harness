@@ -131,4 +131,3 @@ export interface BenchmarkMetadata {
     judgeConfig: ModelConfig;
   };
 }
-

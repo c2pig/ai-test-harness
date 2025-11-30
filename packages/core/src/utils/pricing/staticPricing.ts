@@ -73,9 +73,7 @@ function loadPricingConfig(): Record<string, ModelPricing> {
   const corePricing = loadPricingFromFile(coreConfigPath);
   if (corePricing) {
     mergedPricing = { ...corePricing };
-    Logger.debug(
-      `[Pricing] ✓ Loaded ${Object.keys(corePricing).length} models from core package`
-    );
+    Logger.debug(`[Pricing] ✓ Loaded ${Object.keys(corePricing).length} models from core package`);
   }
 
   // 2. Load project-level pricing (overrides core pricing)

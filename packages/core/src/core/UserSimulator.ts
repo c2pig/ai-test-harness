@@ -1,11 +1,7 @@
 import { Logger } from '../utils/logger';
 import { PromptLoader } from '../utils/promptLoader';
 import { retryWithBackoff } from '../utils/retry';
-import {
-  ILLMClient,
-  LLMClientFactory,
-  ChatRequest,
-} from '../llm';
+import { ILLMClient, LLMClientFactory, ChatRequest } from '../llm';
 
 export interface UserSimulatorConfig {
   modelId: string;

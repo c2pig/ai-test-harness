@@ -1,5 +1,8 @@
 # @ai-test-harness/core
 
+[![npm version](https://badge.fury.io/js/%40ai-test-harness%2Fcore.svg)](https://www.npmjs.com/package/@ai-test-harness/core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Core framework for AI quality testing with AWS Bedrock.
 
 ## Installation
@@ -82,7 +85,15 @@ LITELLM_API_KEY=sk-xxx
 AWS_REGION=us-east-2
 ```
 
+## Documentation
+
+For complete documentation, see the [main repository](https://github.com/c2pig/ai-test-harness).
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/c2pig/ai-test-harness/blob/main/CONTRIBUTING.md) in the main repository.
+
 ## License
 
-MIT
+MIT © AI Test Harness Contributors
 

@@ -5,7 +5,8 @@
 import { ProjectConfig } from '../../generators/types';
 
 export function generateReadme(config: ProjectConfig): string {
-  const isAgentType = config.testType === 'agent-scenario' || config.testType === 'agent-simulation';
+  const isAgentType =
+    config.testType === 'agent-scenario' || config.testType === 'agent-simulation';
 
   const deploySection = isAgentType
     ? `
@@ -123,4 +124,3 @@ qualityAssessment:
 See the [AI Test Harness documentation](https://github.com/your-org/ai-test-harness) for more details.
 `;
 }
-

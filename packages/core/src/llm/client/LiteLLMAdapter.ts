@@ -70,7 +70,7 @@ export class LiteLLMAdapter implements ILLMClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
           model: request.model,
@@ -120,4 +120,3 @@ export class LiteLLMAdapter implements ILLMClient {
     Logger.info('[LiteLLMAdapter] ✓ Destroyed (no cleanup needed)');
   }
 }
-

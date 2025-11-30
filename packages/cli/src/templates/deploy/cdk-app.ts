@@ -7,7 +7,7 @@ import { ProjectConfig } from '../../generators/types';
 export function generateCdkAppTs(config: ProjectConfig): string {
   const stackName = config.projectName
     .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join('');
 
   return `#!/usr/bin/env node
@@ -26,4 +26,3 @@ new HelpdeskAgentStack(app, '${stackName}Stack', {
 });
 `;
 }
-

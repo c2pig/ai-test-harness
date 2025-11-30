@@ -1,0 +1,31 @@
+# Source files
+src/
+tsconfig.json
+
+# Tests
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+__tests__/
+test/
+tests/
+
+# Development
+*.log
+.DS_Store
+.env
+.env.local
+.vscode/
+.idea/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Documentation (include in npm package)
+!README.md
+!CHANGELOG.md
+!LICENSE
+
+# Config
+config/

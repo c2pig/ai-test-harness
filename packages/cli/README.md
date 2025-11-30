@@ -1,5 +1,8 @@
 # @ai-test-harness/cli
 
+[![npm version](https://badge.fury.io/js/%40ai-test-harness%2Fcli.svg)](https://www.npmjs.com/package/@ai-test-harness/cli)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Command-line interface for AI Test Harness - scaffold and run AI quality tests.
 
 ## Installation
@@ -103,7 +106,15 @@ npm run validate
 npm test
 ```
 
+## Documentation
+
+For complete documentation, see the [main repository](https://github.com/c2pig/ai-test-harness).
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/c2pig/ai-test-harness/blob/main/CONTRIBUTING.md) in the main repository.
+
 ## License
 
-MIT
+MIT © AI Test Harness Contributors
 

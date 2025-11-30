@@ -16,4 +16,3 @@ export interface NewCommandOptions {
   type: string;
   yes: boolean;
 }
-

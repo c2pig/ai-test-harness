@@ -141,4 +141,3 @@ function buildOpenAICompatibleRequest(
 
   return request;
 }
-

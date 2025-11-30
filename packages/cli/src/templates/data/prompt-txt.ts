@@ -12,4 +12,3 @@ Question: {{question}}
 Please provide a clear, accurate, and helpful response.
 `;
 }
-

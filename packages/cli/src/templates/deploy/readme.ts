@@ -81,4 +81,3 @@ npx cdk destroy
 \`\`\`
 `;
 }
-

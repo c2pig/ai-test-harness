@@ -33,4 +33,3 @@ acceptanceCriteria:
   - Agent should provide helpful information
 `;
 }
-

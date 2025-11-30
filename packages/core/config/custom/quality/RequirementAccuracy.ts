@@ -9,7 +9,7 @@ export const RequirementAccuracy: QualityAttributeDefinition = {
   name: 'Requirement Accuracy',
   weight: 1.0,
   description:
-    "Correctness of FULFILLED/UNFULFILLED/UNKNOWN decisions for each requirement. The LLM must accurately determine if candidate evidence satisfies each requirement. Incorrect assessments lead to wrong hiring decisions - marking qualified candidates as unqualified (false negatives) or vice versa (false positives). Both errors have real business costs.",
+    'Correctness of FULFILLED/UNFULFILLED/UNKNOWN decisions for each requirement. The LLM must accurately determine if candidate evidence satisfies each requirement. Incorrect assessments lead to wrong hiring decisions - marking qualified candidates as unqualified (false negatives) or vice versa (false positives). Both errors have real business costs.',
   rating: {
     '5': {
       label: 'Excellent',
