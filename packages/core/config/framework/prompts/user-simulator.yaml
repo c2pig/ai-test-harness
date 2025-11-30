@@ -1,0 +1,126 @@
+# User Simulator Prompt Configuration
+#
+# WARNING: This is an advanced internal configuration file.
+# Modifications can significantly impact test scenario realism and emergent behaviors.
+# Only modify if you understand the simulation framework architecture.
+#
+# Design principles:
+# - Emergent behavior: User personality emerges from scenario context, not explicit config
+# - Blackbox testing: User only sees agent messages, NOT tool calls or internal state
+# - Asymmetric information: User doesn't know job/company details upfront
+# - Natural variation: Higher temperature (0.7) for realistic responses
+
+metadata:
+  name: "User Simulator Prompt"
+  description: "LLM-powered user simulator for dynamic agent conversation testing"
+  currentVersion: "v1"
+
+# ==============================================================================
+# AVAILABLE TEMPLATE VARIABLES
+# ==============================================================================
+# Variables use {variableName} syntax and are replaced at runtime.
+# All content must be explicitly specified using variables - no auto-appending.
+#
+# DYNAMIC VARIABLES (provided at runtime by UserSimulator.ts):
+#   {scenarioDescription}     - Test intent and scenario context
+#   {persona}                 - Behavioral characteristics (conditional - if provided)
+#   {candidateDetails}        - Factual background (conditional - if provided)
+#   {conversationExamples}    - Style examples showing tone (conditional - if provided)
+#   {conversationHistory}     - Previous messages (conditional - if provided)
+#   {agentLastMessage}        - Most recent agent message
+#
+# STATIC VARIABLES (from reusableTextBlocks section below):
+#   Any key defined in reusableTextBlocks can be used as {keyName}
+#   Example: {responseInstructions}, {formatInstructions}
+#
+# EXCLUDED FIELDS (intentionally NOT available):
+#   acceptanceCriteria - Excluded to prevent test objective leak to simulator
+#
+# ==============================================================================
+
+# Output format: User responses with optional END_CONVERSATION tag
+outputFormat:
+  structure: |
+    <thinking>
+    Brief reasoning about how to respond
+    </thinking>
+
+    <response>
+    Natural, conversational message to agent
+    </response>
+
+    [OPTIONAL] <END_CONVERSATION>
+
+# Prompt versions
+versions:
+  v1:
+    metadata:
+      stable: true
+      createdDate: "2025-11-01"
+      description: "Current production version with conversation style examples and acceptanceCriteria removed"
+
+    # Reusable text blocks that can be referenced in promptStructure below
+    # These blocks can contain {variables} for dynamic content injection
+    # To add custom sections: define content here, then reference in promptStructure
+    reusableTextBlocks:
+      versionHeader: |
+        <!-- User Simulator Prompt | Version: v1 | Date: 2025-11-01 -->
+      responseInstructions: |
+        1. Respond naturally as the candidate in this scenario
+        2. Consider the scenario intent, your background, and conversation style
+        3. Be realistic - you don't know internal agent state or job details unless told
+        4. Keep responses concise and conversational (2-3 sentences typical)
+        5. If you believe the conversation should end (goal achieved, issue resolved, or impasse reached), include <END_CONVERSATION> tag
+
+      formatInstructions: |
+        Your response should be in this format:
+
+        <thinking>
+        Brief reasoning about how to respond based on scenario intent and agent message.
+        Consider: What is the agent asking? How should I respond given the scenario? Should this conversation end?
+        </thinking>
+
+        <response>
+        Your actual message to the agent (natural, conversational)
+        </response>
+
+        [OPTIONAL] <END_CONVERSATION> (only if you believe conversation goals are met or cannot continue productively)
+
+        Now respond to the agent's latest message:
+
+    # Prompt structure: ordered list of sections with explicit variable replacement
+    #
+    # IMPORTANT: All content must be explicitly specified using {variableName} syntax.
+    # There is NO auto-appending - what you write is exactly what gets rendered.
+    #
+    # Variable replacement rules:
+    # 1. {dynamicVariable} - Replaced with runtime content (see AVAILABLE TEMPLATE VARIABLES above)
+    # 2. {blockName} - Replaced with content from reusableTextBlocks above
+    # 3. No variables - Rendered as literal text
+    #
+    # Customization options:
+    # - Comment out lines to disable sections
+    # - Reorder lines to change section sequence
+    # - Change section titles and formatting
+    # - Add custom sections (define in reusableTextBlocks first)
+    #
+    # Examples:
+    #   - intro: "You are simulating {scenarioDescription}..."  → Variable replaced
+    #   - separator: "---"                                      → Literal text
+    #   - custom: "MY SECTION:\n{customBlock}"                  → Custom block reference
+    #
+    promptStructure:
+      - versionHeader: "{versionHeader}"
+      - intro: "You are simulating a candidate in a conversation with a recruiter AI agent."
+      - role: "YOUR ROLE:"
+      - roleDescription: "You are having a natural conversation with a recruiting agent. Respond authentically based on the scenario context provided."
+      - scenario: "SCENARIO:\n{scenarioDescription}"
+      - persona: "YOUR PERSONA:\n{persona}"
+      - candidateDetails: "YOUR BACKGROUND:\n{candidateDetails}"
+      - conversationExamples: "CONVERSATION STYLE REFERENCE:\n{conversationExamples}"
+      - conversationHistory: "CONVERSATION SO FAR:\n{conversationHistory}"
+      - agentLastMessage: "AGENT'S LATEST MESSAGE:\n{agentLastMessage}"
+      - separator: "---"
+      - responseInstructions: "RESPONSE INSTRUCTIONS:\n{responseInstructions}"
+      - formatInstructions: "FORMAT:\n{formatInstructions}"
+

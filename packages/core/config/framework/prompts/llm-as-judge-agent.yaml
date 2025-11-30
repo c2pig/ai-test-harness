@@ -1,0 +1,277 @@
+# LLM-as-Judge Evaluation Prompt Configuration
+#
+# WARNING: This is an advanced internal configuration file.
+# Modifications can significantly impact evaluation quality and consistency.
+# Only modify if you understand the evaluation framework architecture.
+#
+# For normal quality attribute customization, use custom/quality-attributes/ instead.
+
+metadata:
+  name: "LLM-as-Judge Evaluation Prompt"
+  description: "Prompt template for evaluating AI outputs across quality dimensions"
+  currentVersion: "v1"
+
+# ==============================================================================
+# JUDGE MODEL CONFIGURATION
+# ==============================================================================
+# NOTE: This section is for documentation only. Actual judge model settings
+# are configured per-tenant in tenants/{tenant}/config.yaml under evaluationPlan.judgeModel
+#
+# Expected configuration structure (defined in tenant config):
+# judgeModel:
+#   modelId: bedrock:anthropic.claude-3-5-sonnet-20240620-v1:0
+#   temperature: 0.5    # Conservative for deterministic scoring
+#   topP: 0.7          # Conservative - can restrict for more consistency
+#   maxTokens: 4000    # Sufficient for detailed assessments
+#
+# These settings control the LLM behavior when evaluating outputs using this prompt.
+#
+# ==============================================================================
+# AVAILABLE TEMPLATE VARIABLES
+# ==============================================================================
+# Variables use {variableName} syntax and are replaced at runtime.
+# All content must be explicitly specified using variables - no auto-appending.
+#
+# DYNAMIC VARIABLES (provided at runtime by judge-prompt-generator.ts):
+#   {solutionDescription}      - Brief description of what is being evaluated
+#   {taskPrompt}               - The original task/instructions given to the AI
+#   {inputData}                - Input data provided (conditional - agent tests only)
+#   {taskLLMOutput}            - The task LLM's generated output being evaluated
+#   {expectedBehaviors}        - Validation requirements (conditional - if defined)
+#   {capabilitiesDescription}  - Generated from quality attribute definitions
+#   {schemaShape}              - Dynamically generated JSON schema for output
+#   {attributeCount}           - Number of quality attributes being evaluated
+#   {calibrationSection}       - Optional calibration examples (conditional)
+#   {ratingGuidelines}         - Dynamically generated rating scale from quality attributes
+#                                 Format: "- Rating 1 (Label): Description\n- Rating 2 (Label): ..."
+#   {scoreToGradeMapping}      - Dynamically generated score-to-grade mapping from quality attributes
+#                                 Format: "  * score: 1 ⟹ grade: \"Label\"\n  * score: 2 ⟹ grade: \"Label\"..."
+#                                 Example: "  * score: 5 ⟹ grade: \"Excellent\""
+#
+# STATIC VARIABLES (from reusableTextBlocks section below):
+#   Any key defined in reusableTextBlocks can be used as {keyName}
+#   Example: {ratingGuidelines}, {criticalRequirements}, {doAndDont}
+#
+# ==============================================================================
+
+# Output schema for judge responses
+# Note: Actual schema is dynamically generated per test based on quality attributes
+outputSchema:
+  type: object
+  description: "Judge must return JSON object with evaluated quality attributes"
+  properties:
+    # Dynamic - each quality attribute becomes a key in the response
+    # Example structure:
+    # FlowAdherence:
+    #   score: 4
+    #   grade: "Good"
+    #   reason: "Agent followed the question-driven flow with minor deviations"
+  patternProperties:
+    ".*":
+      type: object
+      required: ["score", "grade", "reason"]
+      properties:
+        score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        grade:
+          type: string
+          # NOTE: Enum values are dynamically generated from quality attributes at runtime
+        reason:
+          type: string
+
+# Prompt versions
+versions:
+  v1:
+    metadata:
+      stable: true
+      createdDate: "2025-11-01"
+      description: "Current production version with attribute omission support and sectional composition"
+
+    # Reusable text blocks that can be referenced in promptStructure below
+    # These blocks can contain {variables} for dynamic content injection
+    # To add custom sections: define content here, then reference in promptStructure
+    reusableTextBlocks:
+      versionHeader: |
+        <!-- LLM-as-Judge Prompt | Version: v1 | Date: 2025-11-01 | Judge Model: {judgeModelId} -->
+      criticalRequirements: |
+        1. ATTRIBUTE OMISSION - MANDATORY:
+           - ONLY evaluate attributes that are genuinely applicable to this scenario
+           - If an attribute is not relevant, you MUST completely OMIT it from your response
+           - DO NOT include non-applicable attributes with any score (including -1, 0, or null)
+           - DO NOT include non-applicable attributes with explanations like "not applicable"
+
+           Examples of when to OMIT attributes:
+           - QuestioningStrategy: Omit for escalation-only conversations where no questions were asked
+           - EvidenceGathering: Omit when no requirements are being verified (e.g., pure escalation scenarios)
+           - RequirementAlignment: Omit when conversation didn't reach requirement verification stage
+
+        2. SCORING AND GRADING - MANDATORY:
+           - For each evaluated attribute, include BOTH the numeric "score" AND the text "grade" field
+           - The valid score-to-grade mappings are:
+             {scoreToGradeMapping}
+           - IMPORTANT: Only use scores that appear in the mapping above
+           - NEVER use scores outside this defined set (no -1, 0, null, undefined, or any unlisted values)
+
+        3. OUTPUT FORMAT:
+           - Return ONLY the JSON object with applicable attributes
+           - No explanatory text before or after the JSON
+           - Be strict in your evaluation
+
+        REMEMBER: If an attribute doesn't apply, OMIT it entirely. Do not include it in your JSON response at all.
+
+      genericOmissionRules: |
+        ATTRIBUTE OMISSION - GENERIC DECISION FRAMEWORK:
+        
+        ═══════════════════════════════════════════════════════════════
+        STEP 1: CLASSIFY CONVERSATION
+        ═══════════════════════════════════════════════════════════════
+        
+        Measure these conversation characteristics:
+        
+        A. Turn Count
+           - Count = number of user messages (exclude agent responses)
+        
+        B. Engagement Level
+           - FULL: User answered ≥3 substantive questions
+           - PARTIAL: User answered 1-2 questions OR raised objections
+           - MINIMAL: User answered 0 questions (declined/exited)
+        
+        C. Interaction Type
+           - QUALIFICATION: Agent attempted to verify requirements
+           - OBJECTION_HANDLING: User raised concerns (price/interest/privacy)
+           - REJECTION: User explicitly declined (not interested)
+           - ESCALATION: Conversation escalated (abuse/sensitive/confusion)
+        
+        ═══════════════════════════════════════════════════════════════
+        STEP 2: CATEGORIZE ATTRIBUTES BY DEPENDENCY
+        ═══════════════════════════════════════════════════════════════
+        
+        For each quality attribute, classify its dependency type:
+        
+        TYPE A - Flow-Dependent Attributes:
+          Require multi-turn conversation structure to assess
+          Examples: FlowAdherence, QuestioningStrategy, EvidenceGathering
+          
+        TYPE B - Response-Level Attributes:
+          Can assess from any single response
+          Examples: ResponseQuality, EscalationHandling
+          
+        TYPE C - Outcome-Dependent Attributes:
+          Require completion of verification process
+          Examples: RequirementAlignment, ActionExecution
+        
+        ═══════════════════════════════════════════════════════════════
+        STEP 3: APPLY OMISSION RULES BY SCENARIO
+        ═══════════════════════════════════════════════════════════════
+        
+        ┌────────────────────────────────────────────────────────────┐
+        │ SCENARIO 1: FULL QUALIFICATION ATTEMPT                     │
+        │ • Turn Count: ≥4                                           │
+        │ • Engagement: FULL                                         │
+        │ • Interaction: QUALIFICATION                               │
+        ├────────────────────────────────────────────────────────────┤
+        │ TYPE A (Flow-Dependent):        ALWAYS SCORE               │
+        │ TYPE B (Response-Level):        ALWAYS SCORE               │
+        │ TYPE C (Outcome-Dependent):     ALWAYS SCORE               │
+        │                                                             │
+        │ Rationale: Sufficient conversation to assess all dimensions│
+        │ If agent failed expected action → Score reflects failure   │
+        └────────────────────────────────────────────────────────────┘
+        
+        ┌────────────────────────────────────────────────────────────┐
+        │ SCENARIO 2: OBJECTION HANDLING                             │
+        │ • Turn Count: 3-6                                          │
+        │ • Engagement: PARTIAL                                      │
+        │ • Interaction: OBJECTION_HANDLING                          │
+        ├────────────────────────────────────────────────────────────┤
+        │ TYPE A (Flow-Dependent):        CONDITIONAL                │
+        │   - Score IF agent attempted flow elements                 │
+        │   - Score 1 IF agent should have but didn't                │
+        │   - Omit IF conversation naturally prevented attempt       │
+        │                                                             │
+        │ TYPE B (Response-Level):        ALWAYS SCORE               │
+        │   - Professional handling is always assessable             │
+        │                                                             │
+        │ TYPE C (Outcome-Dependent):     OMIT                       │
+        │   - Conversation ended before verification phase           │
+        └────────────────────────────────────────────────────────────┘
+        
+        ┌────────────────────────────────────────────────────────────┐
+        │ SCENARIO 3: IMMEDIATE REJECTION                            │
+        │ • Turn Count: ≤2                                           │
+        │ • Engagement: MINIMAL                                      │
+        │ • Interaction: REJECTION                                   │
+        ├────────────────────────────────────────────────────────────┤
+        │ TYPE A (Flow-Dependent):        OMIT                       │
+        │   - Insufficient turns to establish flow                   │
+        │                                                             │
+        │ TYPE B (Response-Level):        ALWAYS SCORE               │
+        │   - Agent's exit handling is assessable                    │
+        │                                                             │
+        │ TYPE C (Outcome-Dependent):     OMIT                       │
+        │   - No verification attempted                              │
+        └────────────────────────────────────────────────────────────┘
+        
+        ┌────────────────────────────────────────────────────────────┐
+        │ SCENARIO 4: ESCALATION REQUIRED                            │
+        │ • Turn Count: Any                                          │
+        │ • Engagement: Any                                          │
+        │ • Interaction: ESCALATION                                  │
+        ├────────────────────────────────────────────────────────────┤
+        │ TYPE A (Flow-Dependent):        OMIT                       │
+        │   - Escalation interrupts normal flow                      │
+        │                                                             │
+        │ TYPE B (Response-Level):        CONDITIONAL                │
+        │   - Score responses BEFORE escalation trigger              │
+        │   - Score escalation handling itself                       │
+        │   - Omit if escalation in first message                    │
+        │                                                             │
+        │ TYPE C (Outcome-Dependent):     OMIT                       │
+        │   - Escalation prevented normal outcome                    │
+        └────────────────────────────────────────────────────────────┘
+        
+        ═══════════════════════════════════════════════════════════════
+        STEP 4: CRITICAL DISTINCTION RULE
+        ═══════════════════════════════════════════════════════════════
+        
+        When deciding between SCORE LOW vs OMIT:
+        
+        ❓ Question: "Should agent have performed action X?"
+        
+        YES, opportunity existed but agent failed
+           → SCORE 1 or 2 (reflects failure to execute)
+           → Example: 6-turn conversation, agent asked 0 questions
+        
+        NO, conversation ended before opportunity
+           → OMIT (action was never applicable)
+           → Example: User hung up after 2 turns
+        
+        ═══════════════════════════════════════════════════════════════
+        STEP 5: ATTRIBUTE CLASSIFICATION INSTRUCTIONS
+        ═══════════════════════════════════════════════════════════════
+        
+        For each attribute in your evaluation set:
+        
+        1. Read the attribute description
+        2. Determine dependency type (A/B/C)
+        3. Identify current conversation scenario (1/2/3/4)
+        4. Apply corresponding omission rule
+        5. If "CONDITIONAL", apply Critical Distinction Rule
+
+    promptStructure:
+      - versionHeader: "{versionHeader}"
+      - intro: "You are evaluating {solutionDescription} for quality across multiple dimensions."
+      - taskPrompt: "TASK PROMPT:\n{taskPrompt}"
+      - inputData: "INPUT DATA:\n{inputData}"
+      - taskLLMOutput: "TASK LLM OUTPUT:\n{taskLLMOutput}"
+      - expectedBehaviors: "EXPECTED BEHAVIORS:\n{expectedBehaviors}"
+      - qualityAttributes: "QUALITY ATTRIBUTES DEFINITIONS:\n\n{capabilitiesDescription}"
+      - calibration: "{calibrationSection}"
+      - separator: "---"
+      - assessmentTask: "ASSESSMENT TASK:\nEvaluate the AI output across these {attributeCount} quality dimensions and return ONLY valid JSON matching this exact format:\n\n{schemaShape}"
+      - ratingGuidelines: "RATING GUIDELINES:\n{ratingGuidelines}"
+      - genericOmissionRules: "OMISSION RULES:\n{genericOmissionRules}"
+      - criticalRequirements: "CRITICAL REQUIREMENTS:\n{criticalRequirements}"
+

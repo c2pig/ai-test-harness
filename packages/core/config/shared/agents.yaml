@@ -1,0 +1,19 @@
+# ============================================
+# BEDROCK AGENTS CONFIGURATION
+# ============================================
+# Bedrock Agent models for conversational AI
+# These are referenced from tenant configs via model name
+
+models:
+  # === Bedrock Agents ===
+  agentOutreach:
+    type: bedrock-agent
+    agentId: URW1SPOSJE
+    agentAliasId: 5OOPVRWGBG
+    region: ap-southeast-2
+
+  agentTest:
+    type: bedrock-agent
+    agentId: XR22CBGMHN
+    agentAliasId: XMOOI8JHUQ
+    region: us-east-1

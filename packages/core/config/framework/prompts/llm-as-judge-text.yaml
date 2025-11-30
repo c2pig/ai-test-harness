@@ -1,0 +1,136 @@
+# LLM-as-Judge Evaluation Prompt Configuration
+#
+# WARNING: This is an advanced internal configuration file.
+# Modifications can significantly impact evaluation quality and consistency.
+# Only modify if you understand the evaluation framework architecture.
+#
+# For normal quality attribute customization, use custom/quality-attributes/ instead.
+
+metadata:
+  name: "LLM-as-Judge Evaluation Prompt"
+  description: "Prompt template for evaluating AI outputs across quality dimensions"
+  currentVersion: "v1"
+
+# ==============================================================================
+# JUDGE MODEL CONFIGURATION
+# ==============================================================================
+# NOTE: This section is for documentation only. Actual judge model settings
+# are configured per-tenant in tenants/{tenant}/config.yaml under evaluationPlan.judgeModel
+#
+# Expected configuration structure (defined in tenant config):
+# judgeModel:
+#   modelId: bedrock:anthropic.claude-3-5-sonnet-20240620-v1:0
+#   temperature: 0.5    # Conservative for deterministic scoring
+#   topP: 0.7          # Conservative - can restrict for more consistency
+#   maxTokens: 4000    # Sufficient for detailed assessments
+#
+# These settings control the LLM behavior when evaluating outputs using this prompt.
+#
+# ==============================================================================
+# AVAILABLE TEMPLATE VARIABLES
+# ==============================================================================
+# Variables use {variableName} syntax and are replaced at runtime.
+# All content must be explicitly specified using variables - no auto-appending.
+#
+# DYNAMIC VARIABLES (provided at runtime by judge-prompt-generator.ts):
+#   {solutionDescription}      - Brief description of what is being evaluated
+#   {taskPrompt}               - The original task/instructions given to the AI
+#   {inputData}                - Input data provided (conditional - agent tests only)
+#   {taskLLMOutput}            - The task LLM's generated output being evaluated
+#   {expectedBehaviors}        - Validation requirements (conditional - if defined)
+#   {capabilitiesDescription}  - Generated from quality attribute definitions
+#   {schemaShape}              - Dynamically generated JSON schema for output
+#   {attributeCount}           - Number of quality attributes being evaluated
+#   {calibrationSection}       - Optional calibration examples (conditional)
+#   {ratingGuidelines}         - Dynamically generated rating scale from quality attributes
+#                                 Format: "- Rating 1 (Label): Description\n- Rating 2 (Label): ..."
+#   {scoreToGradeMapping}      - Dynamically generated score-to-grade mapping from quality attributes
+#                                 Format: "  * score: 1 ⟹ grade: \"Label\"\n  * score: 2 ⟹ grade: \"Label\"..."
+#                                 Example: "  * score: 5 ⟹ grade: \"Excellent\""
+#
+# STATIC VARIABLES (from reusableTextBlocks section below):
+#   Any key defined in reusableTextBlocks can be used as {keyName}
+#   Example: {ratingGuidelines}, {criticalRequirements}, {doAndDont}
+#
+# ==============================================================================
+
+# Output schema for judge responses
+# Note: Actual schema is dynamically generated per test based on quality attributes
+outputSchema:
+  type: object
+  description: "Judge must return JSON object with evaluated quality attributes"
+  properties:
+    # Dynamic - each quality attribute becomes a key in the response
+    # Example structure:
+    # FlowAdherence:
+    #   score: 4
+    #   grade: "Good"
+    #   reason: "Agent followed the question-driven flow with minor deviations"
+  patternProperties:
+    ".*":
+      type: object
+      required: ["score", "grade", "reason"]
+      properties:
+        score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        grade:
+          type: string
+          # NOTE: Enum values are dynamically generated from quality attributes at runtime
+        reason:
+          type: string
+
+# Prompt versions
+versions:
+  v1:
+    metadata:
+      stable: true
+      createdDate: "2025-11-01"
+      description: "Current production version with attribute omission support and sectional composition"
+
+    # Reusable text blocks that can be referenced in promptStructure below
+    # These blocks can contain {variables} for dynamic content injection
+    # To add custom sections: define content here, then reference in promptStructure
+    reusableTextBlocks:
+      versionHeader: |
+        <!-- LLM-as-Judge Prompt | Version: v1 | Date: 2025-11-01 | Judge Model: {judgeModelId} -->
+      criticalRequirements: |
+        1. ATTRIBUTE OMISSION - MANDATORY:
+           - ONLY evaluate attributes that are genuinely applicable to this scenario
+           - If an attribute is not relevant, you MUST completely OMIT it from your response
+           - DO NOT include non-applicable attributes with any score (including -1, 0, or null)
+           - DO NOT include non-applicable attributes with explanations like "not applicable"
+
+           Examples of when to OMIT attributes:
+           - QuestioningStrategy: Omit for escalation-only conversations where no questions were asked
+           - EvidenceGathering: Omit when no requirements are being verified (e.g., pure escalation scenarios)
+           - RequirementAlignment: Omit when conversation didn't reach requirement verification stage
+
+        2. SCORING AND GRADING - MANDATORY:
+           - For each evaluated attribute, include BOTH the numeric "score" AND the text "grade" field
+           - The valid score-to-grade mappings are:
+             {scoreToGradeMapping}
+           - IMPORTANT: Only use scores that appear in the mapping above
+           - NEVER use scores outside this defined set (no -1, 0, null, undefined, or any unlisted values)
+
+        3. OUTPUT FORMAT:
+           - Return ONLY the JSON object with applicable attributes
+           - No explanatory text before or after the JSON
+           - Be strict in your evaluation
+
+        REMEMBER: If an attribute doesn't apply, OMIT it entirely. Do not include it in your JSON response at all.
+
+    promptStructure:
+      - versionHeader: "{versionHeader}"
+      - intro: "You are evaluating {solutionDescription} for quality across multiple dimensions."
+      - taskPrompt: "TASK PROMPT:\n{taskPrompt}"
+      - inputData: "INPUT DATA:\n{inputData}"
+      - taskLLMOutput: "TASK LLM OUTPUT:\n{taskLLMOutput}"
+      - qualityAttributes: "QUALITY ATTRIBUTES DEFINITIONS:\n\n{capabilitiesDescription}"
+      - calibration: "{calibrationSection}"
+      - separator: "---"
+      - assessmentTask: "ASSESSMENT TASK:\nEvaluate the AI output across these {attributeCount} quality dimensions and return ONLY valid JSON matching this exact format:\n\n{schemaShape}"
+      - ratingGuidelines: "RATING GUIDELINES:\n{ratingGuidelines}"
+      - criticalRequirements: "CRITICAL REQUIREMENTS:\n{criticalRequirements}"
+
