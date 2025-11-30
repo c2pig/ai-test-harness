@@ -1,6 +1,6 @@
 {
   "name": "@ai-test-harness/core",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Core framework for AI quality testing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -77,4 +77,3 @@
     "node": ">=18.0.0"
   }
 }
-
