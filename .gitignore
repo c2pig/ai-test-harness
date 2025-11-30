@@ -11,3 +11,4 @@ outputs/
 tenants/xyz
 tenants/abc
 .cache/
+*.tsbuildinfo

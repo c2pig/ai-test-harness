@@ -26,8 +26,8 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "type-check": "tsc --noEmit"
+    "build": "tsc --build",
+    "type-check": "tsc --build"
   },
   "keywords": [
     "ai",

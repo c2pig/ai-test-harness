@@ -7,10 +7,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
-    "build:core": "npm run build -w @ai-test-harness/core",
-    "build:cli": "npm run build -w @ai-test-harness/cli",
-    "type-check": "npm run type-check --workspaces --if-present",
+    "build": "tsc --build",
+    "build:core": "tsc --build packages/core",
+    "build:cli": "tsc --build packages/cli",
+    "type-check": "tsc --build",
+    "clean": "tsc --build --clean",
     "lint": "eslint packages --ext .ts",
     "lint:fix": "eslint packages --ext .ts --fix",
     "format": "prettier --write \"packages/**/*.ts\"",

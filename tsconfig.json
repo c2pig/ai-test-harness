@@ -1,23 +1,7 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
-    "lib": ["ES2022"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "paths": {
-      "@ai-test-harness/core": ["./packages/core/src"],
-      "@ai-test-harness/core/*": ["./packages/core/src/*"]
-    }
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "packages"]
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/cli" }
+  ]
 }
