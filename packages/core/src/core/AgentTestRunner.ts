@@ -110,7 +110,7 @@ export class AgentTestRunner extends BaseRunner {
 
     const results: any[] = [];
 
-    Logger.info(`[AgentTestRunner] Processing ${scenarios.length} scenarios`);
+    Logger.debug(`[AgentTestRunner] Processing ${scenarios.length} scenarios`);
 
     for (let i = 0; i < scenarios.length; i++) {
       const scenario = scenarios[i];
@@ -329,7 +329,7 @@ export class AgentTestRunner extends BaseRunner {
       }
     }
 
-    Logger.info(`[AgentTestRunner] Completed ${results.length} scenarios`);
+    Logger.debug(`[AgentTestRunner] Completed ${results.length} scenarios`);
 
     if (results.length > 0) {
       // Build benchmark metadata for tracking test configuration
@@ -713,6 +713,6 @@ export class AgentTestRunner extends BaseRunner {
     lines.push('='.repeat(80));
     lines.push(`Total scenarios: ${results.length}`);
 
-    Logger.info(lines.join('\n'));
+    Logger.debug(lines.join('\n'));
   }
 }

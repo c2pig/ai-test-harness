@@ -92,7 +92,7 @@ export class ExpectedToolCallValidator {
           parameterMatch,
         });
 
-        Logger.debug(`[ExpectedToolCallValidator] ✓ Expected tool call found: ${actualCall.toolName}`);
+        Logger.info(`[ExpectedToolCallValidator] ✓ Expected tool call found: ${actualCall.toolName}`);
       } else {
         // Unexpected call
         unexpectedToolCalls.push(actualCall.toolName);
@@ -118,7 +118,7 @@ export class ExpectedToolCallValidator {
       unexpectedToolCalls.length === 0 &&
       details.every(d => d.parameterMatch !== false);
 
-    Logger.info(`[ExpectedToolCallValidator] Validation ${validationPassed ? 'PASSED' : 'FAILED'}`);
+    Logger.debug(`[ExpectedToolCallValidator] Validation ${validationPassed ? 'PASSED' : 'FAILED'}`);
 
     return {
       expectedToolCallsFound,

@@ -62,7 +62,7 @@ export class AgentInstructionRetriever {
    * Retrieve agent metadata including instructions and foundation model
    */
   async retrieve(agentId: string, agentAliasId?: string): Promise<AgentMetadata> {
-    Logger.info(
+    Logger.debug(
       `[AgentInstructionRetriever] Fetching instructions from Bedrock for agentId: ${agentId}`
     );
 
@@ -94,16 +94,16 @@ export class AgentInstructionRetriever {
         : undefined;
 
       Logger.info(`[AgentInstructionRetriever] ✓ Successfully fetched from Bedrock`);
-      Logger.info(`[AgentInstructionRetriever] Agent name: ${response.agent.agentName}`);
-      Logger.info(`[AgentInstructionRetriever] Agent status: ${response.agent.agentStatus}`);
-      Logger.info(`[AgentInstructionRetriever] Agent version: ${agentVersion || 'not available'}`);
-      Logger.info(`[AgentInstructionRetriever] Foundation model: ${foundationModel}`);
-      Logger.info(
+      Logger.debug(`[AgentInstructionRetriever] Agent name: ${response.agent.agentName}`);
+      Logger.debug(`[AgentInstructionRetriever] Agent status: ${response.agent.agentStatus}`);
+      Logger.debug(`[AgentInstructionRetriever] Agent version: ${agentVersion || 'not available'}`);
+      Logger.debug(`[AgentInstructionRetriever] Foundation model: ${foundationModel}`);
+      Logger.debug(
         `[AgentInstructionRetriever] Instruction length: ${response.agent.instruction.length} characters`
       );
 
       if (inferenceConfig) {
-        Logger.info(
+        Logger.debug(
           `[AgentInstructionRetriever] Inference config: temp=${inferenceConfig.temperature}, topP=${inferenceConfig.topP}, topK=${inferenceConfig.topK}, maxTokens=${inferenceConfig.maxTokens}`
         );
       }
@@ -121,7 +121,7 @@ export class AgentInstructionRetriever {
           actionGroupsResponse.actionGroupSummaries &&
           actionGroupsResponse.actionGroupSummaries.length > 0
         ) {
-          Logger.info(
+          Logger.debug(
             `[AgentInstructionRetriever] Found ${actionGroupsResponse.actionGroupSummaries.length} action group(s)`
           );
 
@@ -173,7 +173,7 @@ export class AgentInstructionRetriever {
                         });
                       });
 
-                      Logger.info(
+                      Logger.debug(
                         `[AgentInstructionRetriever]   Extracted ${functions.length} function(s) from functionSchema`
                       );
                     } catch (parseError) {
@@ -250,7 +250,7 @@ export class AgentInstructionRetriever {
                           });
                         });
 
-                        Logger.info(
+                        Logger.debug(
                           `[AgentInstructionRetriever]   Extracted ${functions.length} function(s) from OpenAPI schema`
                         );
                       }
@@ -268,7 +268,7 @@ export class AgentInstructionRetriever {
                     functions: functions.length > 0 ? functions : undefined,
                   });
 
-                  Logger.info(
+                  Logger.debug(
                     `[AgentInstructionRetriever] ✓ Action group: ${ag.actionGroupName} (${ag.actionGroupState}), ${functions.length} function(s)`
                   );
                 }
@@ -294,7 +294,7 @@ export class AgentInstructionRetriever {
           description: kb.description,
           knowledgeBaseState: kb.knowledgeBaseState,
         }));
-        Logger.info(
+        Logger.debug(
           `[AgentInstructionRetriever] Found ${knowledgeBases?.length ?? 0} knowledge base(s)`
         );
       }
@@ -309,7 +309,7 @@ export class AgentInstructionRetriever {
             guardrailVersion: agentData.guardrailConfiguration.guardrailVersion || 'DRAFT',
           },
         ];
-        Logger.info(`[AgentInstructionRetriever] Found guardrail configuration`);
+        Logger.debug(`[AgentInstructionRetriever] Found guardrail configuration`);
       }
 
       return {

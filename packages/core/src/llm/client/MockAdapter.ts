@@ -22,7 +22,7 @@ export class MockAdapter implements ILLMClient {
   private simulatedLatencyMs: number = 10;
 
   constructor(_config?: LLMClientConfig) {
-    Logger.info('[MockAdapter] Initialized for testing');
+    Logger.debug('[MockAdapter] Initialized for testing');
   }
 
   /**

@@ -22,24 +22,24 @@ export class PostgreSQLConnector implements IConnector {
     }
 
     this.secretsManager = new SecretsManager();
-    Logger.info(`[PostgreSQL] Initialized connector: ${config.name}`);
+    Logger.debug(`[PostgreSQL] Initialized connector: ${config.name}`);
   }
 
   private async getPool(): Promise<Pool> {
     if (this.pool) {
-      Logger.info(`[PostgreSQL] Using existing connection pool`);
+      Logger.debug(`[PostgreSQL] Using existing connection pool`);
       return this.pool;
     }
 
-    Logger.info(`[PostgreSQL] Creating new connection pool...`);
+    Logger.debug(`[PostgreSQL] Creating new connection pool...`);
 
     const host = process.env.DB_HOST;
     const port = parseInt(process.env.DB_PORT || '5432');
     const database = process.env.DB_NAME;
 
-    Logger.info(`[PostgreSQL] DB_HOST from env: ${host}`);
-    Logger.info(`[PostgreSQL] DB_PORT from env: ${port}`);
-    Logger.info(`[PostgreSQL] DB_NAME from env: ${database}`);
+    Logger.debug(`[PostgreSQL] DB_HOST from env: ${host}`);
+    Logger.debug(`[PostgreSQL] DB_PORT from env: ${port}`);
+    Logger.debug(`[PostgreSQL] DB_NAME from env: ${database}`);
 
     if (!host || !database) {
       Logger.error(
@@ -54,7 +54,7 @@ export class PostgreSQLConnector implements IConnector {
       throw new Error('Missing environment variable: DB_SECRET_NAME');
     }
 
-    Logger.info(`[PostgreSQL] Retrieving credentials from Secrets Manager: ${secretName}`);
+    Logger.debug(`[PostgreSQL] Retrieving credentials from Secrets Manager: ${secretName}`);
     const secret = await this.secretsManager.getSecret(secretName);
 
     const user = secret.username;
@@ -85,7 +85,7 @@ export class PostgreSQLConnector implements IConnector {
   }
 
   async fetch(): Promise<any[]> {
-    Logger.info(`[PostgreSQL] Validating query for write operations...`);
+    Logger.debug(`[PostgreSQL] Validating query for write operations...`);
     if (this.config.query.match(/DELETE|UPDATE|INSERT|DROP|ALTER/i)) {
       Logger.error(`[PostgreSQL] ✗ Query contains forbidden write operation`);
       throw new Error('Write operations are not allowed');
@@ -95,8 +95,8 @@ export class PostgreSQLConnector implements IConnector {
     const pool = await this.getPool();
 
     try {
-      Logger.info(`[PostgreSQL] Executing query...`);
-      Logger.info(`[PostgreSQL] Query preview: ${this.config.query.substring(0, 100)}...`);
+      Logger.debug(`[PostgreSQL] Executing query...`);
+      Logger.debug(`[PostgreSQL] Query preview: ${this.config.query.substring(0, 100)}...`);
 
       const result = await retryWithBackoff(() => pool.query(this.config.query), 3, 1000);
 

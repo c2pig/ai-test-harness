@@ -21,7 +21,7 @@ export class PricingService {
     this.awsClient = new AwsPricingClient();
     this.cache = new PricingCache(cacheDir);
 
-    Logger.info(
+    Logger.debug(
       `[PricingService] ${this.enabled ? 'Using AWS Pricing API with static fallback' : 'Using static pricing only'}`
     );
   }
@@ -114,7 +114,7 @@ export class PricingService {
   clearCache(): void {
     this.cache.clearAll();
     this.pricingData.clear();
-    Logger.info('[PricingService] All caches cleared');
+    Logger.debug('[PricingService] All caches cleared');
   }
 }
 

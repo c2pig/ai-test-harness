@@ -21,7 +21,7 @@ export class EnvLoader {
       return;
     }
 
-    Logger.info(`Loading environment from: ${envFile}`);
+    Logger.debug(`Loading environment from: ${envFile}`);
 
     const envContent = fs.readFileSync(envFile, 'utf-8');
     const lines = envContent.split('\n');
@@ -44,6 +44,6 @@ export class EnvLoader {
       }
     });
 
-    Logger.info(`Environment loaded: ${env}`);
+    Logger.debug(`Environment loaded: ${env}`);
   }
 }

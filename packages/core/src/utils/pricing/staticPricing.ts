@@ -73,7 +73,7 @@ function loadPricingConfig(): Record<string, ModelPricing> {
   const corePricing = loadPricingFromFile(coreConfigPath);
   if (corePricing) {
     mergedPricing = { ...corePricing };
-    Logger.info(
+    Logger.debug(
       `[Pricing] ✓ Loaded ${Object.keys(corePricing).length} models from core package`
     );
   }
@@ -83,7 +83,7 @@ function loadPricingConfig(): Record<string, ModelPricing> {
   const projectPricing = loadPricingFromFile(projectConfigPath);
   if (projectPricing && Object.keys(projectPricing).length > 0) {
     mergedPricing = { ...mergedPricing, ...projectPricing };
-    Logger.info(
+    Logger.debug(
       `[Pricing] ✓ Merged ${Object.keys(projectPricing).length} models from project config`
     );
   }
@@ -134,5 +134,5 @@ export function hasStaticPricing(modelId: string): boolean {
  */
 export function clearPricingCache(): void {
   cachedPricing = null;
-  Logger.info('[Pricing] Cache cleared');
+  Logger.debug('[Pricing] Cache cleared');
 }

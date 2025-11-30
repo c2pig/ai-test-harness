@@ -20,7 +20,7 @@ export class ConfigLoader {
     const baseDir = path.dirname(configPath);
 
     // Validate config with Zod schema
-    Logger.info(`[ConfigLoader] Validating config with Zod schema`);
+    Logger.debug(`[ConfigLoader] Validating config with Zod schema`);
     const validationResult = validateTenantConfig(configPath);
 
     if (!validationResult.valid) {
@@ -35,7 +35,7 @@ export class ConfigLoader {
       );
     }
 
-    Logger.info(
+    Logger.debug(
       `[ConfigLoader] ✓ Config validated successfully (schema: ${validationResult.data.schemaVersion})`
     );
     const config = validationResult.data as any; // Cast to any for legacy compatibility during transition
@@ -88,12 +88,12 @@ export class ConfigLoader {
     const scenariosPath = config.testPlan.scenariosPath;
 
     if (!scenariosPath) {
-      Logger.info('[ConfigLoader] No scenariosPath specified, using inline scenarios');
+      Logger.debug('[ConfigLoader] No scenariosPath specified, using inline scenarios');
       return;
     }
 
     const resolvedPath = path.resolve(baseDir, scenariosPath);
-    Logger.info(`[ConfigLoader] Loading scenarios from: ${scenariosPath}`);
+    Logger.debug(`[ConfigLoader] Loading scenarios from: ${scenariosPath}`);
 
     const scenarioFiles = await glob(resolvedPath, { nodir: true });
 
@@ -121,7 +121,7 @@ export class ConfigLoader {
 
         const scenario = validationResult.data;
         scenarios.push(scenario);
-        Logger.info(
+        Logger.debug(
           `[ConfigLoader]   ✓ Loaded scenario: ${scenario.scenarioId} from ${path.basename(file)}`
         );
       } catch (error) {
@@ -131,7 +131,7 @@ export class ConfigLoader {
 
     // Inject into test plan
     config.testPlan.scenarios = scenarios;
-    Logger.info(
+    Logger.debug(
       `[ConfigLoader] ✓ Loaded ${scenarios.length} scenarios from ${scenarioFiles.length} files`
     );
   }
@@ -177,7 +177,7 @@ export class ConfigLoader {
       return;
     }
 
-    Logger.info(`[ConfigLoader] Loading calibration from: ${calibrationPath}`);
+    Logger.debug(`[ConfigLoader] Loading calibration from: ${calibrationPath}`);
 
     try {
       // Validate calibration with Zod schema
@@ -193,7 +193,7 @@ export class ConfigLoader {
 
       const calibration = validationResult.data;
       config.evaluationPlan.qualityAssessment.calibration = calibration;
-      Logger.info(
+      Logger.debug(
         `[ConfigLoader] ✓ Loaded calibration with ${calibration.examples.length} examples (enabled: ${calibration.enabled})`
       );
     } catch (error) {
@@ -229,7 +229,7 @@ export class ConfigLoader {
 
     const modelsConfigDir = path.join(projectRoot, 'config', 'shared');
 
-    Logger.info(
+    Logger.debug(
       `[ConfigLoader] Loading model '${modelRef.name}' (type: ${modelRef.type}) from shared models`
     );
 
@@ -280,7 +280,7 @@ export class ConfigLoader {
    * Parse validators from configuration and create validator instances
    */
   private static parseValidators(config: any): void {
-    Logger.info(`[ConfigLoader] Parsing validators`);
+    Logger.debug(`[ConfigLoader] Parsing validators`);
 
     try {
       const validatorInstances = createValidators(config.validators);

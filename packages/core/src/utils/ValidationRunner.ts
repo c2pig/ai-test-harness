@@ -48,7 +48,7 @@ export class ValidationRunner {
 
         // Log validation result
         const status = validationResult.passed ? '✓' : '✗';
-        Logger.info(`[ValidationRunner] ${status} ${validator.name}: ${validationResult.message}`);
+        Logger.debug(`[ValidationRunner] ${status} ${validator.name}: ${validationResult.message}`);
       } catch (error) {
         Logger.error(`[ValidationRunner] Error running validator ${validator.name}`, error);
         // Continue with other validators even if one fails

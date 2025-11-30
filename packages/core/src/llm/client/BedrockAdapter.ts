@@ -40,7 +40,7 @@ export class BedrockAdapter implements ILLMClient {
       }),
     });
 
-    Logger.info(
+    Logger.debug(
       `[BedrockAdapter] Initialized for region: ${this.region} (timeout: ${timeout}ms)`
     );
   }
@@ -52,7 +52,7 @@ export class BedrockAdapter implements ILLMClient {
     const startTime = Date.now();
     const modelId = cleanModelId(request.model);
 
-    Logger.info(`[BedrockAdapter] Invoking model: ${modelId}`);
+    Logger.debug(`[BedrockAdapter] Invoking model: ${modelId}`);
 
     try {
       // Get model family and build request body using shared utilities
@@ -72,7 +72,7 @@ export class BedrockAdapter implements ILLMClient {
         body: JSON.stringify(requestBody),
       });
 
-      Logger.info(`[BedrockAdapter] Sending request to Bedrock...`);
+      Logger.debug(`[BedrockAdapter] Sending request to Bedrock...`);
       const response = await retryWithBackoff(
         () => this.client.send(command),
         3,
@@ -87,7 +87,7 @@ export class BedrockAdapter implements ILLMClient {
       const { content, inputTokens, outputTokens } = parseResponse(modelFamily, responseBody);
 
       Logger.info(`[BedrockAdapter] ✓ Response received (${latencyMs}ms)`);
-      Logger.info(
+      Logger.debug(
         `[BedrockAdapter] Tokens: ${inputTokens} input, ${outputTokens} output`
       );
 

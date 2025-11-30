@@ -53,7 +53,7 @@ export class LiteLLMAdapter implements ILLMClient {
     this.apiKey = config?.apiKey || process.env.LITELLM_API_KEY || 'sk-1234';
     this.timeout = config?.timeout || 90000;
 
-    Logger.info(`[LiteLLMAdapter] Initialized for endpoint: ${this.baseUrl}`);
+    Logger.debug(`[LiteLLMAdapter] Initialized for endpoint: ${this.baseUrl}`);
   }
 
   /**
@@ -62,7 +62,7 @@ export class LiteLLMAdapter implements ILLMClient {
   async chat(request: ChatRequest): Promise<ChatResponse> {
     const startTime = Date.now();
 
-    Logger.info(`[LiteLLMAdapter] Invoking model: ${request.model}`);
+    Logger.debug(`[LiteLLMAdapter] Invoking model: ${request.model}`);
 
     try {
       // LiteLLM uses OpenAI format natively - direct pass-through
@@ -92,7 +92,7 @@ export class LiteLLMAdapter implements ILLMClient {
       const data = (await response.json()) as LiteLLMResponse;
 
       Logger.info(`[LiteLLMAdapter] ✓ Response received (${latencyMs}ms)`);
-      Logger.info(
+      Logger.debug(
         `[LiteLLMAdapter] Tokens: ${data.usage?.prompt_tokens || 0} input, ${data.usage?.completion_tokens || 0} output`
       );
 

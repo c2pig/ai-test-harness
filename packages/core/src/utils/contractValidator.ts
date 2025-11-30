@@ -10,7 +10,7 @@ export class ContractValidator {
   ): void {
     // Skip validation if contracts not declared (backward compatibility)
     if (!connectorOutputSchema && !promptInputKeys) {
-      Logger.info(`[ContractValidator] No contracts declared - skipping validation`);
+      Logger.debug(`[ContractValidator] No contracts declared - skipping validation`);
       return;
     }
 
@@ -60,7 +60,7 @@ export class ContractValidator {
       throw new Error(errorMessage);
     }
 
-    Logger.info(
+    Logger.debug(
       `[ContractValidator] ✓ Contract validation passed - ` +
         `Connector '${connectorName}' provides all ${requiredKeys.length} required fields`
     );

@@ -21,7 +21,7 @@ export class PromptLibraryConnector implements IConnector {
         throw new Error(`Prompt file not found: ${fullPath}`);
       }
 
-      Logger.info(`Loading prompt from ${fullPath}`);
+      Logger.debug(`Loading prompt from ${fullPath}`);
 
       const fileContent = fs.readFileSync(fullPath, 'utf-8');
 

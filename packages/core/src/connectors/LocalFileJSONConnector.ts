@@ -21,14 +21,14 @@ export class LocalFileJSONConnector implements IConnector {
   }
 
   async fetch(): Promise<any[]> {
-    Logger.info(`[LocalFileJSON] Connector: ${this.config.name}`);
-    Logger.info(`[LocalFileJSON] File Path: ${this.config.filePath}`);
+    Logger.debug(`[LocalFileJSON] Connector: ${this.config.name}`);
+    Logger.debug(`[LocalFileJSON] File Path: ${this.config.filePath}`);
 
     // Resolve the file path relative to the project root
     const projectRoot = process.cwd();
     const resolvedPath = path.resolve(projectRoot, this.config.filePath);
 
-    Logger.info(`[LocalFileJSON] Resolved Path: ${resolvedPath}`);
+    Logger.debug(`[LocalFileJSON] Resolved Path: ${resolvedPath}`);
 
     try {
       // Check if path exists
@@ -41,13 +41,13 @@ export class LocalFileJSONConnector implements IConnector {
 
       if (stats.isDirectory()) {
         // Read all .json files in the directory
-        Logger.info(`[LocalFileJSON] Reading all .json files from directory...`);
+        Logger.debug(`[LocalFileJSON] Reading all .json files from directory...`);
         const files = fs
           .readdirSync(resolvedPath)
           .filter(file => file.endsWith('.json'))
           .map(file => path.join(resolvedPath, file));
 
-        Logger.info(`[LocalFileJSON] Found ${files.length} JSON files`);
+        Logger.debug(`[LocalFileJSON] Found ${files.length} JSON files`);
 
         for (const file of files) {
           const fileData = this.readJSONFile(file);
@@ -55,11 +55,11 @@ export class LocalFileJSONConnector implements IConnector {
         }
       } else {
         // Read single JSON file
-        Logger.info(`[LocalFileJSON] Reading single JSON file...`);
+        Logger.debug(`[LocalFileJSON] Reading single JSON file...`);
         allData = this.readJSONFile(resolvedPath);
       }
 
-      Logger.info(`[LocalFileJSON] Total records loaded: ${allData.length}`);
+      Logger.info(`[LocalFileJSON] ✓ Successfully transformed ${allData.length} items`);
 
       // Apply maxRecords limit if configured
       const recordsToProcess =
@@ -68,7 +68,7 @@ export class LocalFileJSONConnector implements IConnector {
           : allData;
 
       if (this.config.maxRecords && allData.length > this.config.maxRecords) {
-        Logger.info(
+        Logger.debug(
           `[LocalFileJSON] Limiting results from ${allData.length} to ${this.config.maxRecords} records`
         );
       }

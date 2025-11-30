@@ -98,13 +98,13 @@ export class ConversationSimulator {
     const effectiveSessionId =
       sessionId || `sim-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    Logger.info(`[ConversationSimulator] Starting conversation simulation`);
-    Logger.info(`[ConversationSimulator] Agent ID: ${agentId}`);
-    Logger.info(`[ConversationSimulator] Agent Alias ID: ${agentAliasId}`);
-    Logger.info(`[ConversationSimulator] Session ID: ${effectiveSessionId}`);
-    Logger.info(`[ConversationSimulator] User messages: ${userMessages.length}`);
+    Logger.debug(`[ConversationSimulator] Starting conversation simulation`);
+    Logger.debug(`[ConversationSimulator] Agent ID: ${agentId}`);
+    Logger.debug(`[ConversationSimulator] Agent Alias ID: ${agentAliasId}`);
+    Logger.debug(`[ConversationSimulator] Session ID: ${effectiveSessionId}`);
+    Logger.debug(`[ConversationSimulator] User messages: ${userMessages.length}`);
     if (contextData) {
-      Logger.info(
+      Logger.debug(
         `[ConversationSimulator] Context data provided: ${Object.keys(contextData).join(', ')}`
       );
     }
@@ -128,7 +128,7 @@ export class ConversationSimulator {
         isContextInjection: true,
       });
 
-      Logger.info(
+      Logger.debug(
         `[ConversationSimulator] Context injected as assistant message (${JSON.stringify(contextData).length} chars)`
       );
     }
@@ -143,7 +143,7 @@ export class ConversationSimulator {
         timestamp: new Date().toISOString(),
       });
 
-      Logger.info(
+      Logger.debug(
         `[ConversationSimulator] Turn ${i + 1} - User: ${userMessage.substring(0, 50)}...`
       );
 
@@ -180,16 +180,16 @@ export class ConversationSimulator {
         aggregatedTraceMetrics.toolInvocations += agentResponse.toolCalls?.length || 0;
       }
 
-      Logger.info(
+      Logger.debug(
         `[ConversationSimulator] Turn ${i + 1} - Agent: ${agentResponse.text.substring(0, 50)}... (${turnLatency}ms)`
       );
       if (agentResponse.toolCalls && agentResponse.toolCalls.length > 0) {
-        Logger.info(
+        Logger.debug(
           `[ConversationSimulator] Tool calls: ${agentResponse.toolCalls.map(tc => tc.toolName).join(', ')}`
         );
       }
       if (agentResponse.traceData?.reasoning && agentResponse.traceData.reasoning.length > 0) {
-        Logger.info(
+        Logger.debug(
           `[ConversationSimulator] Reasoning captured: ${agentResponse.traceData.reasoning.length} thought(s)`
         );
       }
@@ -197,10 +197,10 @@ export class ConversationSimulator {
 
     const endTime = new Date().toISOString();
 
-    Logger.info(
+    Logger.debug(
       `[ConversationSimulator] ✓ Conversation complete - ${turns.length} turns, ${totalLatencyMs}ms total`
     );
-    Logger.info(
+    Logger.debug(
       `[ConversationSimulator] Trace metrics - Model invocations: ${aggregatedTraceMetrics.modelInvocations}, Tool calls: ${aggregatedTraceMetrics.toolInvocations}, Reasoning captures: ${aggregatedTraceMetrics.reasoningCaptures}`
     );
 

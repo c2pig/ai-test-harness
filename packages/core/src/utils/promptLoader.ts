@@ -62,7 +62,7 @@ export class PromptLoader {
         throw new Error(`Invalid prompt manifest: no versions defined in ${filePath}`);
       }
 
-      Logger.info(
+      Logger.debug(
         `[PromptLoader] Loaded ${promptType} manifest: ${Object.keys(manifest.versions).length} versions available`
       );
 
@@ -129,7 +129,7 @@ export class PromptLoader {
       });
 
       if (shouldOmit) {
-        Logger.info(
+        Logger.debug(
           `[PromptLoader] Omitting section '${sectionId}' - conditional variable is empty`
         );
         continue;

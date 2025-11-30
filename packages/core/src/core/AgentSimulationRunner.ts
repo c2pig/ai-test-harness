@@ -162,7 +162,7 @@ export class AgentSimulationRunner extends BaseRunner {
     // Get batch size from test plan (defaults to 1 for sequential execution)
     const batchSize = testPlan.batchSize || 1;
 
-    Logger.info(`[AgentSimulationRunner] Processing ${scenarios.length} scenarios (batch size: ${batchSize})`);
+    Logger.debug(`[AgentSimulationRunner] Processing ${scenarios.length} scenarios (batch size: ${batchSize})`);
 
     // Process scenarios in batches
     for (let batchStart = 0; batchStart < scenarios.length; batchStart += batchSize) {
@@ -200,7 +200,7 @@ export class AgentSimulationRunner extends BaseRunner {
       }
     }
 
-    Logger.info(`[AgentSimulationRunner] Completed ${results.length} scenarios`);
+    Logger.debug(`[AgentSimulationRunner] Completed ${results.length} scenarios`);
 
     if (results.length > 0) {
       // Build benchmark metadata

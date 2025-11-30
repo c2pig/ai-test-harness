@@ -19,7 +19,7 @@ export class AwsPricingClient {
       const data = await response.json();
       const pricingMap = this.parsePricingData(data, region);
 
-      Logger.debug(`[AwsPricingClient] ✓ Fetched pricing for ${pricingMap.size} models`);
+      Logger.info(`[AwsPricingClient] ✓ Fetched pricing for ${pricingMap.size} models`);
       return pricingMap;
     } catch (error) {
       Logger.error(`[AwsPricingClient] Failed to fetch pricing: ${error}`);

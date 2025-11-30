@@ -52,7 +52,7 @@ export class LLMClientFactory {
       timeout: config?.timeout || 90000,
     };
 
-    Logger.info(`[LLMClientFactory] Creating client: provider=${provider}`);
+    Logger.debug(`[LLMClientFactory] Creating client: provider=${provider}`);
 
     switch (provider) {
       case 'bedrock':

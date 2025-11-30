@@ -72,13 +72,13 @@ export class UserSimulator {
     this.client = client || LLMClientFactory.create({ region: resolvedRegion });
     this.config = config;
 
-    Logger.info(
+    Logger.debug(
       `[UserSimulator] Initialized with model: ${config.modelId}, region: ${resolvedRegion}`
     );
-    Logger.info(
+    Logger.debug(
       `[UserSimulator] Temperature: ${config.temperature}, TopP: ${config.topP}, MaxTokens: ${config.maxTokens}`
     );
-    Logger.info(`[UserSimulator] Using ${client ? 'injected' : 'factory'} client`);
+    Logger.debug(`[UserSimulator] Using ${client ? 'injected' : 'factory'} client`);
   }
 
   /**
@@ -94,13 +94,13 @@ export class UserSimulator {
     agentLastMessage: string,
     scenario: ScenarioContext
   ): Promise<UserResponse> {
-    Logger.info(`[UserSimulator] Generating response for scenario: ${scenario.scenarioId}`);
+    Logger.debug(`[UserSimulator] Generating response for scenario: ${scenario.scenarioId}`);
 
     const prompt = this.buildUserSimulatorPrompt(conversationHistory, agentLastMessage, scenario);
-    Logger.info(`[UserSimulator] Prompt length: ${prompt.length} characters`);
+    Logger.debug(`[UserSimulator] Prompt length: ${prompt.length} characters`);
 
     const modelId = this.config.modelId.replace('bedrock:', '');
-    Logger.info(`[UserSimulator] Invoking model: ${modelId}`);
+    Logger.debug(`[UserSimulator] Invoking model: ${modelId}`);
 
     const timestamp = new Date().toISOString();
 
@@ -114,7 +114,7 @@ export class UserSimulator {
         max_tokens: this.config.maxTokens,
       };
 
-      Logger.info(`[UserSimulator] Sending request via LLM client...`);
+      Logger.debug(`[UserSimulator] Sending request via LLM client...`);
 
       // Use retry wrapper around client.chat
       const response = await retryWithBackoff(
@@ -130,12 +130,12 @@ export class UserSimulator {
       const { message, shouldEnd, reasoning } = this.parseUserResponse(content);
 
       Logger.info(`[UserSimulator] ✓ Response generated`);
-      Logger.info(`[UserSimulator] Message length: ${message.length} characters`);
-      Logger.info(`[UserSimulator] Should end: ${shouldEnd}`);
-      Logger.info(
+      Logger.debug(`[UserSimulator] Message length: ${message.length} characters`);
+      Logger.debug(`[UserSimulator] Should end: ${shouldEnd}`);
+      Logger.debug(
         `[UserSimulator] Tokens: ${usage.prompt_tokens} input, ${usage.completion_tokens} output, ${usage.total_tokens} total`
       );
-      Logger.info(`[UserSimulator] Latency: ${latency_ms}ms`);
+      Logger.debug(`[UserSimulator] Latency: ${latency_ms}ms`);
 
       return {
         message,

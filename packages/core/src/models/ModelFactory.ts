@@ -39,13 +39,13 @@ export class ModelFactory {
       return;
     }
 
-    Logger.info(`Loading models from split configuration files`);
+    Logger.debug(`Loading models from split configuration files`);
 
     const agentsLoaded = this.loadModelsFromFile(agentsPath, 'agents');
     const promptsLoaded = this.loadModelsFromFile(promptsPath, 'prompts');
 
     const totalLoaded = agentsLoaded + promptsLoaded;
-    Logger.info(
+    Logger.debug(
       `Loaded ${totalLoaded} model configurations (${agentsLoaded} agents, ${promptsLoaded} prompts)`
     );
   }

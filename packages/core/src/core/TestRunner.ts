@@ -118,13 +118,13 @@ export class TestRunner extends BaseRunner {
     const taskPrompt = fetchResults[1];
     const dbRecords = dbConnector ? fetchResults[2] : [];
 
-    Logger.info(
+    Logger.debug(
       `[TestRunner] ✓ Data fetched - Logs: ${logEvents.length}${dbConnector ? `, DB records: ${dbRecords.length}` : ''}`
     );
 
     // Apply sampleSize limit if specified in test plan
     if (testPlan.sampleSize && testPlan.sampleSize < logEvents.length) {
-      Logger.info(
+      Logger.debug(
         `[TestRunner] Applying sampleSize limit: ${testPlan.sampleSize} (connector provided ${logEvents.length} records)`
       );
       logEvents = logEvents.slice(0, testPlan.sampleSize);
@@ -140,7 +140,7 @@ export class TestRunner extends BaseRunner {
     const recordKey = (logsConnector as any).getRecordKey?.() || 'recommendationId';
 
     const maxTests = maxRecords ? Math.min(maxRecords, logEvents.length) : logEvents.length;
-    Logger.info(
+    Logger.debug(
       `[TestRunner] Will process ${maxTests} tests (limited by ${maxRecords ? `maxRecords: ${maxRecords}` : 'log events'}, log events: ${logEvents.length})`
     );
 
@@ -159,7 +159,7 @@ export class TestRunner extends BaseRunner {
       : configuredBatchSize;
 
     if (isMultiModel && effectiveBatchSize !== configuredBatchSize) {
-      Logger.info(
+      Logger.debug(
         `[TestRunner] Adjusted batch size from ${configuredBatchSize} to ${effectiveBatchSize} for ${llmConfigs.length} models`
       );
     } else {
@@ -171,7 +171,7 @@ export class TestRunner extends BaseRunner {
       const batchEnd = Math.min(i + effectiveBatchSize, maxTests);
       const batchEvents = logEvents.slice(i, batchEnd);
 
-      Logger.info(
+      Logger.debug(
         `[TestRunner] Processing batch ${Math.floor(i / effectiveBatchSize) + 1} (tests ${i + 1}-${batchEnd}/${maxTests})`
       );
 
@@ -261,13 +261,13 @@ export class TestRunner extends BaseRunner {
         }
       }
 
-      Logger.info(
+      Logger.debug(
         `[TestRunner] Batch completed: ${validResults.length}/${batchEvents.length * llmConfigs.length} tests successful`
       );
     }
 
     // Completion log removed
-    Logger.info(`[TestRunner] Completed - Total results: ${results.length}`);
+    Logger.info(`[TestRunner] ✓ Completed - Total results: ${results.length}`);
     // Completion log removed
 
     if (results.length > 0) {
@@ -347,7 +347,7 @@ export class TestRunner extends BaseRunner {
     const { _metadata, ...cleanData } = event;
     const inputData: Record<string, any> = cleanData;
 
-    Logger.info(
+    Logger.debug(
       `[TestRunner] Using smart-extracted data with ${Object.keys(inputData).length} fields`
     );
 
@@ -375,11 +375,11 @@ export class TestRunner extends BaseRunner {
 
     // Separator removed
     if (totalModels > 1) {
-      Logger.info(
+      Logger.debug(
         `[TestRunner] Processing test ${index + 1}/${maxTests} - Model ${modelIdx + 1}/${totalModels} (${modelAlias}) - Test ID: ${testId}`
       );
     } else {
-      Logger.info(`[TestRunner] Processing test ${index + 1}/${maxTests} - Test ID: ${testId}`);
+      Logger.debug(`[TestRunner] Processing test ${index + 1}/${maxTests} - Test ID: ${testId}`);
     }
 
     try {

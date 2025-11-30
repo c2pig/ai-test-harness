@@ -27,7 +27,7 @@ export class ConnectorFactory {
       this.connectors.set(name, { ...connectorConfig, name });
     });
 
-    Logger.info(`Loaded ${this.connectors.size} connector configurations`);
+    Logger.debug(`Loaded ${this.connectors.size} connector configurations`);
   }
 
   getConnectorConfig(name: string): ConnectorConfig | undefined {

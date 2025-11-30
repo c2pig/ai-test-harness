@@ -43,18 +43,18 @@ export class AgentReplayTestRunner {
    * Run replay tests on conversations from DynamoDB
    */
   async runTests(): Promise<AgentReplayResult[]> {
-    Logger.info('[AgentReplayTestRunner] Starting agent replay tests...');
+    Logger.debug('[AgentReplayTestRunner] Starting agent replay tests...');
 
     // Fetch conversations from DynamoDB
-    Logger.info('[AgentReplayTestRunner] Fetching conversations from connector...');
+    Logger.debug('[AgentReplayTestRunner] Fetching conversations from connector...');
     const conversations = await this.config.conversationsConnector.fetch();
-    Logger.info(`[AgentReplayTestRunner] Fetched ${conversations.length} conversations`);
+    Logger.debug(`[AgentReplayTestRunner] Fetched ${conversations.length} conversations`);
 
     const results: AgentReplayResult[] = [];
 
     for (let i = 0; i < conversations.length; i++) {
       const conv = conversations[i];
-      Logger.info(
+      Logger.debug(
         `[AgentReplayTestRunner] Processing conversation ${i + 1}/${conversations.length}: ${conv.conversationId}`
       );
 
@@ -71,7 +71,7 @@ export class AgentReplayTestRunner {
       }
     }
 
-    Logger.info(
+    Logger.debug(
       `[AgentReplayTestRunner] ✓ Completed replay tests - ${results.length}/${conversations.length} successful`
     );
 
@@ -173,10 +173,10 @@ export class AgentReplayTestRunner {
    * Get all conversation results (without validation) for judge evaluation
    */
   async getConversationsForJudge(): Promise<ConversationResult[]> {
-    Logger.info('[AgentReplayTestRunner] Loading conversations for judge evaluation...');
+    Logger.debug('[AgentReplayTestRunner] Loading conversations for judge evaluation...');
 
     const conversations = await this.config.conversationsConnector.fetch();
-    Logger.info(`[AgentReplayTestRunner] Loaded ${conversations.length} conversations`);
+    Logger.debug(`[AgentReplayTestRunner] Loaded ${conversations.length} conversations`);
 
     return conversations.map((conv: any) => this.convertToConversationResult(conv));
   }

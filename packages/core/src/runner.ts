@@ -13,6 +13,7 @@ import { TestRunner } from './core/TestRunner';
 import { AgentTestRunner } from './core/AgentTestRunner';
 import { AgentSimulationRunner } from './core/AgentSimulationRunner';
 import { Logger } from './utils/logger';
+import { CustomAttributeLoader } from './quality-library/custom-loader';
 
 /**
  * Options for running tests
@@ -74,12 +75,15 @@ export async function runTests(options: RunTestsOptions = {}): Promise<RunTestsR
   const configFile = options.configFile || 'config.yaml';
   const configPath = path.join(projectPath, configFile);
 
+  // Set project path for custom attribute loading
+  CustomAttributeLoader.setProjectPath(projectPath);
+
   // Validate config exists
   if (!fs.existsSync(configPath)) {
     throw new Error(`Config file not found: ${configPath}`);
   }
 
-  Logger.info(`[Runner] Loading config from: ${configPath}`);
+  Logger.debug(`[Runner] Loading config from: ${configPath}`);
 
   // Load configuration to determine test type
   const config = await loadProjectConfig(projectPath, configFile);

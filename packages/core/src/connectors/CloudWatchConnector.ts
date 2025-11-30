@@ -25,28 +25,28 @@ export class CloudWatchConnector implements IConnector {
 
     const region = process.env.AWS_REGION || 'ap-southeast-1';
     this.client = new CloudWatchLogsClient({ region });
-    Logger.info(`[CloudWatch] Initialized client for region: ${region}`);
+    Logger.debug(`[CloudWatch] Initialized client for region: ${region}`);
   }
 
   async fetch(): Promise<any[]> {
     const endTime = Date.now();
     const startTime = endTime - this.config.dateRange * 24 * 60 * 60 * 1000;
 
-    Logger.info(`[CloudWatch] Connector: ${this.config.name}`);
-    Logger.info(`[CloudWatch] Log Group: ${this.config.logGroup}`);
-    Logger.info(
+    Logger.debug(`[CloudWatch] Connector: ${this.config.name}`);
+    Logger.debug(`[CloudWatch] Log Group: ${this.config.logGroup}`);
+    Logger.debug(
       `[CloudWatch] Filter Pattern: ${this.config.filterPattern || 'generateTextPattern'}`
     );
-    Logger.info(`[CloudWatch] Date Range: ${this.config.dateRange} days`);
-    Logger.info(
+    Logger.debug(`[CloudWatch] Date Range: ${this.config.dateRange} days`);
+    Logger.debug(
       `[CloudWatch] Query Period: ${new Date(startTime).toISOString()} to ${new Date(endTime).toISOString()}`
     );
     if (this.config.maxRecords) {
-      Logger.info(`[CloudWatch] Max Records: ${this.config.maxRecords}`);
+      Logger.debug(`[CloudWatch] Max Records: ${this.config.maxRecords}`);
     }
 
     try {
-      Logger.info(`[CloudWatch] Fetching log events with pagination...`);
+      Logger.debug(`[CloudWatch] Fetching log events with pagination...`);
 
       // Fetch events with pagination support
       let allEvents: any[] = [];
@@ -98,7 +98,7 @@ export class CloudWatchConnector implements IConnector {
         }
       } while (nextToken && (!this.config.maxRecords || allEvents.length < this.config.maxRecords));
 
-      Logger.info(
+      Logger.debug(
         `[CloudWatch] ✓ Successfully retrieved ${allEvents.length} log events across ${pageCount} page(s)`
       );
 
@@ -109,25 +109,25 @@ export class CloudWatchConnector implements IConnector {
           : allEvents;
 
       if (this.config.maxRecords && allEvents.length > this.config.maxRecords) {
-        Logger.info(
+        Logger.debug(
           `[CloudWatch] Limiting results from ${allEvents.length} to ${this.config.maxRecords} records`
         );
       }
 
-      Logger.info(`[CloudWatch] Parsing ${eventsToProcess.length} events...`);
+      Logger.debug(`[CloudWatch] Parsing ${eventsToProcess.length} events...`);
       const parsed = eventsToProcess.map((event, index) => {
         let message = null;
         if (event.message) {
           try {
             if (index === 0) {
-              Logger.info(`[CloudWatch] Raw message type: ${typeof event.message}`);
-              Logger.info(
+              Logger.debug(`[CloudWatch] Raw message type: ${typeof event.message}`);
+              Logger.debug(
                 `[CloudWatch] Raw message first 200 chars: ${event.message.substring(0, 200)}`
               );
             }
             message = JSON.parse(event.message);
             if (index === 0) {
-              Logger.info(`[CloudWatch] After parse type: ${typeof message}`);
+              Logger.debug(`[CloudWatch] After parse type: ${typeof message}`);
             }
           } catch (error: any) {
             Logger.warn(
@@ -144,10 +144,10 @@ export class CloudWatchConnector implements IConnector {
       });
 
       if (parsed.length > 0 && parsed[0].message) {
-        Logger.info(`[CloudWatch] - message type: ${typeof parsed[0].message}`);
-        Logger.info(`[CloudWatch] - recommendationId: ${parsed[0].message.recommendationId}`);
-        Logger.info(`[CloudWatch] - jobId: ${parsed[0].message.jobId}`);
-        Logger.info(`[CloudWatch] - msg field: ${parsed[0].message.msg?.substring(0, 100)}`);
+        Logger.debug(`[CloudWatch] - message type: ${typeof parsed[0].message}`);
+        Logger.debug(`[CloudWatch] - recommendationId: ${parsed[0].message.recommendationId}`);
+        Logger.debug(`[CloudWatch] - jobId: ${parsed[0].message.jobId}`);
+        Logger.debug(`[CloudWatch] - msg field: ${parsed[0].message.msg?.substring(0, 100)}`);
       }
 
       Logger.info(`[CloudWatch] ✓ Events parsed successfully`);

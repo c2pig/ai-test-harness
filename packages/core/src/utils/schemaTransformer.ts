@@ -24,18 +24,18 @@ export function applyOutputSchemaToArray(
 ): any[] {
   const logPrefix = connectorName ? `[${connectorName}]` : '[SchemaTransformer]';
 
-  Logger.info(`${logPrefix} Applying outputSchema transformation to ${items.length} items...`);
-  Logger.info(`${logPrefix} Output fields: ${Object.keys(outputSchema).join(', ')}`);
+  Logger.debug(`${logPrefix} Applying outputSchema transformation to ${items.length} items...`);
+  Logger.debug(`${logPrefix} Output fields: ${Object.keys(outputSchema).join(', ')}`);
 
   const transformed = items.map((item, index) => {
     const result = applyOutputSchema(item, outputSchema);
 
     // Log first item as sample
     if (index === 0) {
-      Logger.info(
+      Logger.debug(
         `${logPrefix} Sample transformation - Input keys: ${Object.keys(item).slice(0, 5).join(', ')}`
       );
-      Logger.info(
+      Logger.debug(
         `${logPrefix} Sample transformation - Output keys: ${Object.keys(result).join(', ')}`
       );
 

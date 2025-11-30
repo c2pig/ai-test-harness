@@ -50,7 +50,7 @@ export abstract class BaseRunner {
     Logger.debug(`[${runnerName}] Loading config from: ${configPath}`);
 
     const config = await ConfigLoader.load(configPath);
-    Logger.debug(`[${runnerName}] ✓ Config loaded: ${config.project.description}`);
+    Logger.info(`[${runnerName}] ✓ Config loaded: ${config.project.description}`);
 
     // Validate test plan type
     const expectedType = this.getExpectedTestPlanType();
@@ -140,11 +140,11 @@ export abstract class BaseRunner {
       );
     }
 
-    Logger.debug(`[${runnerName}] ✓ Quality attributes valid: ${attributeNames.join(', ')}`);
+    Logger.info(`[${runnerName}] ✓ Quality attributes valid: ${attributeNames.join(', ')}`);
 
     // Build dynamic schema from configured attributes
     const schema = await buildQualityAssessmentSchema(attributeNames);
-    Logger.debug(`[${runnerName}] ✓ Schema built for ${attributeNames.length} attributes`);
+    Logger.info(`[${runnerName}] ✓ Schema built for ${attributeNames.length} attributes`);
 
     return { schema, attributeNames };
   }
@@ -160,7 +160,7 @@ export abstract class BaseRunner {
       const status = score >= 4 ? '✓' : score >= 3 ? '⚠' : '✗';
       lines.push(`  ${status} ${capability}: ${score}/5 (${grade}) - ${data.reason}`);
     });
-    Logger.info(lines.join('\n'));
+    Logger.debug(lines.join('\n'));
   }
 
   /**
@@ -199,7 +199,7 @@ export abstract class BaseRunner {
     lines.push('='.repeat(80));
     lines.push(`Total tests: ${results.length}`);
 
-    Logger.info(lines.join('\n'));
+    Logger.debug(lines.join('\n'));
   }
 
   /**

@@ -22,17 +22,17 @@ export class DynamoDBConnector implements IConnector {
 
     const region = config.region || process.env.AWS_REGION || 'ap-southeast-2';
     this.client = new DynamoDBClient({ region });
-    Logger.info(`[DynamoDB] Initialized client for region: ${region}`);
+    Logger.debug(`[DynamoDB] Initialized client for region: ${region}`);
   }
 
   async fetch(): Promise<any[]> {
-    Logger.info(`[DynamoDB] Connector: ${this.config.name}`);
-    Logger.info(`[DynamoDB] Table: ${this.config.tableName}`);
-    Logger.info(`[DynamoDB] Max records: ${this.config.maxRecords || 'unlimited'}`);
+    Logger.debug(`[DynamoDB] Connector: ${this.config.name}`);
+    Logger.debug(`[DynamoDB] Table: ${this.config.tableName}`);
+    Logger.debug(`[DynamoDB] Max records: ${this.config.maxRecords || 'unlimited'}`);
 
     try {
       // Scan the table to get all conversations
-      Logger.info(`[DynamoDB] Scanning table...`);
+      Logger.debug(`[DynamoDB] Scanning table...`);
       const command = new ScanCommand({
         TableName: this.config.tableName,
         Limit: this.config.maxRecords,
@@ -48,15 +48,15 @@ export class DynamoDBConnector implements IConnector {
 
       // Apply legacy schemaMapping extraction if configured
       if (this.config.schemaMapping) {
-        Logger.info(`[DynamoDB] Applying schemaMapping extraction (legacy)...`);
+        Logger.debug(`[DynamoDB] Applying schemaMapping extraction (legacy)...`);
         data = items.map((item, index) => {
           return this.extractConversationData(item, index);
         });
-        Logger.info(
+        Logger.debug(
           `[DynamoDB] ✓ Successfully extracted ${data.length} conversations using schemaMapping`
         );
       } else {
-        Logger.info(`[DynamoDB] No schemaMapping configured - using raw DynamoDB items`);
+        Logger.debug(`[DynamoDB] No schemaMapping configured - using raw DynamoDB items`);
       }
 
       // outputSchema is now required (validated in constructor)
@@ -90,28 +90,28 @@ export class DynamoDBConnector implements IConnector {
     const createdAt = this.extractField(item, schema.createdAt);
 
     if (index === 0) {
-      Logger.info(`[DynamoDB] Sample extraction - conversationId: ${conversationId}`);
+      Logger.debug(`[DynamoDB] Sample extraction - conversationId: ${conversationId}`);
     }
 
     // Extract message history
     const messageHistory = this.extractMessageHistory(item, schema.messageHistory);
 
     if (index === 0) {
-      Logger.info(`[DynamoDB] Sample extraction - messageHistory length: ${messageHistory.length}`);
+      Logger.debug(`[DynamoDB] Sample extraction - messageHistory length: ${messageHistory.length}`);
     }
 
     // Extract user messages
     const userMessages = this.extractUserMessages(messageHistory, schema.extraction.userMessages);
 
     if (index === 0) {
-      Logger.info(`[DynamoDB] Sample extraction - userMessages count: ${userMessages.length}`);
+      Logger.debug(`[DynamoDB] Sample extraction - userMessages count: ${userMessages.length}`);
     }
 
     // Extract context data from first assistant message
     const contextData = this.extractContextData(messageHistory, schema.extraction.contextData);
 
     if (index === 0 && contextData) {
-      Logger.info(
+      Logger.debug(
         `[DynamoDB] Sample extraction - contextData keys: ${Object.keys(contextData).join(', ')}`
       );
     }

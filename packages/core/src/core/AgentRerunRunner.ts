@@ -80,8 +80,8 @@ export class AgentRerunRunner extends BaseRunner {
         agentConfig.agentId,
         agentConfig.agentAliasId
       );
-      Logger.debug(`[AgentRerunRunner] ✓ Agent metadata retrieved`);
-      Logger.info(
+      Logger.info(`[AgentRerunRunner] ✓ Agent metadata retrieved`);
+      Logger.debug(
         `[AgentRerunRunner]   Agent: ${agentConfig.agentId} (${agentConfig.agentAliasId})`
       );
       Logger.debug(`[AgentRerunRunner]   Foundation model: ${agentMetadata.foundationModel}`);
@@ -140,11 +140,11 @@ export class AgentRerunRunner extends BaseRunner {
     // Fetch conversations from DynamoDB
     Logger.debug(`[AgentRerunRunner] Fetching conversations from connector...`);
     const conversations = await conversationsConnector.fetch();
-    Logger.debug(`[AgentRerunRunner] ✓ Fetched ${conversations.length} conversations from DynamoDB`);
+    Logger.info(`[AgentRerunRunner] ✓ Fetched ${conversations.length} conversations from DynamoDB`);
 
     // Get expected tool calls configuration
     if (expectedToolCalls.length > 0) {
-      Logger.info(
+      Logger.debug(
         `[AgentRerunRunner] ✓ Tool call validation enabled with ${expectedToolCalls.length} expected tools`
       );
     }
@@ -160,7 +160,7 @@ export class AgentRerunRunner extends BaseRunner {
       const dbConversation = conversations[i];
 
       Logger.debug(`[AgentRerunRunner] ----------------------------------------`);
-      Logger.info(
+      Logger.debug(
         `[AgentRerunRunner] Processing conversation ${i + 1}/${conversations.length} - ${dbConversation.conversationId}`
       );
       Logger.debug(`[AgentRerunRunner] Record ID: ${dbConversation.recordId}`);
@@ -168,7 +168,7 @@ export class AgentRerunRunner extends BaseRunner {
 
       try {
         // Reinvoke agent with historical user messages
-        Logger.info(
+        Logger.debug(
           `[AgentRerunRunner] Reinvoking agent with ${dbConversation.userMessages.length} user messages...`
         );
 
@@ -183,7 +183,7 @@ export class AgentRerunRunner extends BaseRunner {
           dbConversation.contextData
         );
 
-        Logger.info(
+        Logger.debug(
           `[AgentRerunRunner] ✓ Conversation regenerated - ${conversationResult.turns.length} turns, ${conversationResult.totalLatencyMs}ms`
         );
 
@@ -204,7 +204,7 @@ export class AgentRerunRunner extends BaseRunner {
               `[AgentRerunRunner]   Unexpected: ${toolValidation.unexpectedToolCalls.join(', ')}`
             );
           } else {
-            Logger.debug(`[AgentRerunRunner] ✓ Tool validation passed`);
+            Logger.info(`[AgentRerunRunner] ✓ Tool validation passed`);
           }
         }
 
@@ -230,7 +230,7 @@ export class AgentRerunRunner extends BaseRunner {
           judgeConfig
         );
 
-        Logger.info(
+        Logger.debug(
           `[AgentRerunRunner] ✓ Assessment completed for conversation ${dbConversation.conversationId}`
         );
 
@@ -301,7 +301,7 @@ export class AgentRerunRunner extends BaseRunner {
     }
 
     Logger.debug(`[AgentRerunRunner] ========================================`);
-    Logger.info(
+    Logger.debug(
       `[AgentRerunRunner] All conversations completed - Total results: ${results.length}`
     );
     Logger.debug(`[AgentRerunRunner] ========================================`);
@@ -356,7 +356,7 @@ export class AgentRerunRunner extends BaseRunner {
     Logger.debug(`[AgentRerunRunner] Cleaning up resources...`);
     this.judge?.destroy();
     simulator.destroy();
-    Logger.debug(`[AgentRerunRunner] ✓ Resources cleaned up`);
+    Logger.info(`[AgentRerunRunner] ✓ Resources cleaned up`);
 
     // Calculate pass/fail counts and average score
     const passed = results.filter(r => r.assessment && !r.error).length;
@@ -590,7 +590,7 @@ export class AgentRerunRunner extends BaseRunner {
     });
 
     fs.writeFileSync(agentConfigPath, yamlContent, 'utf-8');
-    Logger.debug(`[AgentRerunRunner] ✓ Wrote agent configuration to: 0-agent-config.yaml`);
+    Logger.info(`[AgentRerunRunner] ✓ Wrote agent configuration to: 0-agent-config.yaml`);
   }
 
   /**
@@ -649,7 +649,7 @@ export class AgentRerunRunner extends BaseRunner {
 
     if (results.length === 0) {
       lines.push('No conversations processed');
-      Logger.info(lines.join('\n'));
+      Logger.debug(lines.join('\n'));
       return;
     }
 
@@ -700,6 +700,6 @@ export class AgentRerunRunner extends BaseRunner {
     lines.push('='.repeat(80));
     lines.push(`Total conversations: ${results.length}`);
 
-    Logger.info(lines.join('\n'));
+    Logger.debug(lines.join('\n'));
   }
 }

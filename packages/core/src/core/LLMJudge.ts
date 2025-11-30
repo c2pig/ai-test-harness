@@ -51,7 +51,7 @@ export class LLMJudge {
   constructor(region?: string, client?: ILLMClient) {
     // Allow injection for testing, otherwise use factory
     this.client = client || LLMClientFactory.create({ region });
-    Logger.info(`[LLMJudge] Initialized with ${client ? 'injected' : 'factory'} client`);
+    Logger.debug(`[LLMJudge] Initialized with ${client ? 'injected' : 'factory'} client`);
   }
 
   async evaluate(
@@ -63,10 +63,10 @@ export class LLMJudge {
     calibration?: { enabled: boolean; examples: CalibrationExample[] },
     inferenceConfig?: { temperature?: number; topP?: number; maxTokens?: number }
   ): Promise<EvaluateResult> {
-    Logger.info(`[LLMJudge] Generating assessment prompt...`);
-    Logger.info(`[LLMJudge] Solution: ${solutionDescription}`);
-    Logger.info(`[LLMJudge] Attributes: ${attributeNames.length}`);
-    Logger.info(
+    Logger.debug(`[LLMJudge] Generating assessment prompt...`);
+    Logger.debug(`[LLMJudge] Solution: ${solutionDescription}`);
+    Logger.debug(`[LLMJudge] Attributes: ${attributeNames.length}`);
+    Logger.debug(
       `[LLMJudge] Calibration examples: ${calibration?.enabled ? calibration.examples.length : 0}`
     );
 
@@ -106,7 +106,7 @@ export class LLMJudge {
     // Track original prompt for return value
     const promptToReturn = originalPrompt || prompt;
     const cleanedModelId = modelId.replace('bedrock:', '');
-    Logger.info(`[LLMJudge] Invoking model: ${cleanedModelId} (attempt ${attempt}/2)`);
+    Logger.debug(`[LLMJudge] Invoking model: ${cleanedModelId} (attempt ${attempt}/2)`);
 
     // Apply conservative defaults
     const temperature = inferenceConfig?.temperature ?? 0;
@@ -123,7 +123,7 @@ export class LLMJudge {
       };
     }
 
-    Logger.info(
+    Logger.debug(
       `[LLMJudge] Request config: maxTokens=${maxTokens}, temperature=${temperature}, topP=${topP}`
     );
 
@@ -137,7 +137,7 @@ export class LLMJudge {
         max_tokens: maxTokens,
       };
 
-      Logger.info(`[LLMJudge] Sending request via LLM client...`);
+      Logger.debug(`[LLMJudge] Sending request via LLM client...`);
 
       // Use retry wrapper around client.chat
       const response = await retryWithBackoff(
@@ -156,8 +156,8 @@ export class LLMJudge {
       accumulatedMetrics.totalInput += usage.prompt_tokens;
       accumulatedMetrics.totalOutput += usage.completion_tokens;
 
-      Logger.info(`[LLMJudge] Response length: ${content.length} characters`);
-      Logger.info(`[LLMJudge] Parsing JSON from response...`);
+      Logger.debug(`[LLMJudge] Response length: ${content.length} characters`);
+      Logger.debug(`[LLMJudge] Parsing JSON from response...`);
 
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
@@ -181,19 +181,19 @@ export class LLMJudge {
         }
       }
       if (removedAttributes.length > 0) {
-        Logger.info(
+        Logger.debug(
           `[LLMJudge] ⚠ Removed ${removedAttributes.length} non-applicable attributes: ${removedAttributes.join(', ')}`
         );
       }
 
       try {
-        Logger.info(`[LLMJudge] Validating against schema...`);
+        Logger.debug(`[LLMJudge] Validating against schema...`);
         const validated = schema.parse(parsed);
         Logger.info(`[LLMJudge] ✓ Schema validation passed`);
-        Logger.info(
+        Logger.debug(
           `[LLMJudge] Tokens: ${accumulatedMetrics.totalInput} input, ${accumulatedMetrics.totalOutput} output`
         );
-        Logger.info(
+        Logger.debug(
           `[LLMJudge] Total latency: ${accumulatedMetrics.totalLatency}ms across ${attempt} attempt(s)`
         );
 

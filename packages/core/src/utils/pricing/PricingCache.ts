@@ -24,7 +24,7 @@ export class PricingCache {
   private ensureCacheDir(): void {
     if (!fs.existsSync(this.cacheDir)) {
       fs.mkdirSync(this.cacheDir, { recursive: true });
-      Logger.info(`[PricingCache] Created cache directory: ${this.cacheDir}`);
+      Logger.debug(`[PricingCache] Created cache directory: ${this.cacheDir}`);
     }
   }
 
@@ -113,7 +113,7 @@ export class PricingCache {
 
   clearMemory(): void {
     this.memoryCache.clear();
-    Logger.info('[PricingCache] Memory cache cleared');
+    Logger.debug('[PricingCache] Memory cache cleared');
   }
 
   clearAll(): void {
@@ -124,7 +124,7 @@ export class PricingCache {
         fs.readdirSync(this.cacheDir).forEach(file => {
           fs.unlinkSync(path.join(this.cacheDir, file));
         });
-        Logger.info('[PricingCache] File cache cleared');
+        Logger.debug('[PricingCache] File cache cleared');
       }
     } catch (error) {
       Logger.warn(`[PricingCache] Error clearing file cache: ${error}`);

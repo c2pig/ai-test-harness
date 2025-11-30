@@ -34,14 +34,14 @@ export class ConversationJudge extends LLMJudge {
     acceptanceCriteria?: string[],
     inferenceConfig?: { temperature?: number; topP?: number; maxTokens?: number }
   ): Promise<EvaluateResult> {
-    Logger.info('[ConversationJudge] Building conversation evaluation context...');
+    Logger.debug('[ConversationJudge] Building conversation evaluation context...');
 
     // Build conversation transcript
     const transcript = this.buildTranscript(conversation);
 
     // Extract all tool calls from conversation
     const toolCalls = this.extractToolCalls(conversation);
-    Logger.info(`[ConversationJudge] Tool calls found: ${toolCalls.length}`);
+    Logger.debug(`[ConversationJudge] Tool calls found: ${toolCalls.length}`);
 
     // Build context for judge with explicit tool call data
     const context: ConversationEvaluationContext & Record<string, any> = {
@@ -52,9 +52,9 @@ export class ConversationJudge extends LLMJudge {
       acceptanceCriteria,
     };
 
-    Logger.info(`[ConversationJudge] Transcript: ${transcript.length} characters`);
-    Logger.info(`[ConversationJudge] Turns: ${conversation.turns.length}`);
-    Logger.info(`[ConversationJudge] Duration: ${conversation.totalLatencyMs}ms`);
+    Logger.debug(`[ConversationJudge] Transcript: ${transcript.length} characters`);
+    Logger.debug(`[ConversationJudge] Turns: ${conversation.turns.length}`);
+    Logger.debug(`[ConversationJudge] Duration: ${conversation.totalLatencyMs}ms`);
 
     // Use base LLMJudge evaluate method
     const result = await this.evaluate(
@@ -98,7 +98,7 @@ export class ConversationJudge extends LLMJudge {
       const categoryLog = Object.entries(grouped.byCategory)
         .map(([cat, scores]) => `${cat}: ${scores.weightedAverage}`)
         .join(', ');
-      Logger.info(
+      Logger.debug(
         `[ConversationJudge] Score breakdown - ${categoryLog}, Overall: ${grouped.overall.weightedAverage}`
       );
     } catch (error) {

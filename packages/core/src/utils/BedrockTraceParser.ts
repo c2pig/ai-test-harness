@@ -144,7 +144,7 @@ export class BedrockTraceParser {
       result: undefined, // No result yet, this is just the invocation
     });
 
-    Logger.info(`[BedrockTraceParser] Captured tool invocation: ${funcName || fullName}`);
+    Logger.debug(`[BedrockTraceParser] Captured tool invocation: ${funcName || fullName}`);
   }
 
   /**

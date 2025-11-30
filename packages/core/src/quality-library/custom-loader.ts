@@ -6,8 +6,25 @@ import { Logger } from '../utils/logger';
 // Load custom quality attributes from config/custom/ (framework + custom attributes)
 export class CustomAttributeLoader {
   private static readonly CUSTOM_PREFIX = 'custom/';
-  private static readonly CUSTOM_BASE_PATH = path.resolve(__dirname, '../../config/custom');
+  private static readonly FRAMEWORK_CUSTOM_PATH = path.resolve(__dirname, '../../config/custom');
+  private static projectPath: string | null = null;
   private static attributeCache: Map<string, QualityAttributeDefinition> = new Map();
+
+  /**
+   * Set the project path for loading custom attributes
+   * Must be called before loading any custom attributes
+   */
+  static setProjectPath(projectPath: string): void {
+    this.projectPath = projectPath;
+    this.clearCache(); // Clear cache when project path changes
+  }
+
+  /**
+   * Get the current project path
+   */
+  static getProjectPath(): string | null {
+    return this.projectPath;
+  }
 
   static isCustomAttribute(name: string): boolean {
     return name.toLowerCase().startsWith(this.CUSTOM_PREFIX);
@@ -26,7 +43,13 @@ export class CustomAttributeLoader {
       );
     }
 
-    const [category, attributeName] = parts;
+    let [category, attributeName] = parts;
+
+    // Normalize "qualities" to "quality" for backward compatibility
+    if (category === 'qualities') {
+      category = 'quality';
+    }
+
     return { category, attributeName };
   }
 
@@ -39,14 +62,34 @@ export class CustomAttributeLoader {
     // Parse path
     const { category, attributeName } = this.parseCustomPath(attributePath);
 
-    // Build file path: config/{category}/{attributeName}.ts
-    const filePath = path.join(this.CUSTOM_BASE_PATH, category, `${attributeName}.ts`);
+    Logger.debug(`[CustomAttributeLoader] Loading: ${attributePath} (category=${category}, name=${attributeName})`);
 
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
+    // Build potential file paths (project first, then framework)
+    const potentialPaths: string[] = [];
+
+    if (this.projectPath) {
+      // Check project custom/qualities/ (CLI convention)
+      potentialPaths.push(path.join(this.projectPath, 'custom', 'qualities', `${attributeName}.ts`));
+      // Check project custom/quality/ (framework convention)
+      potentialPaths.push(path.join(this.projectPath, 'custom', 'quality', `${attributeName}.ts`));
+    }
+
+    // Framework path
+    potentialPaths.push(path.join(this.FRAMEWORK_CUSTOM_PATH, category, `${attributeName}.ts`));
+
+    // Find first existing file
+    let filePath: string | null = null;
+    for (const p of potentialPaths) {
+      if (fs.existsSync(p)) {
+        filePath = p;
+        break;
+      }
+    }
+
+    if (!filePath) {
       throw new Error(
-        `Custom attribute file not found: ${filePath}\n` +
-          `Expected path: custom/${category}/${attributeName}.ts`
+        `Custom attribute file not found. Searched:\n` +
+        potentialPaths.map(p => `  - ${p}`).join('\n')
       );
     }
 
@@ -60,7 +103,7 @@ export class CustomAttributeLoader {
       if (!attributeDefinition) {
         throw new Error(
           `Custom attribute "${attributeName}" not exported from ${filePath}\n` +
-            `Expected: export const ${attributeName}: QualityAttributeDefinition = { ... }`
+            `Expected: export const ${attributeName} = { ... }`
         );
       }
 
@@ -95,29 +138,42 @@ export class CustomAttributeLoader {
    */
   static async listAvailable(): Promise<string[]> {
     const attributes: string[] = [];
+    const basePaths: string[] = [this.FRAMEWORK_CUSTOM_PATH];
+
+    // Add project custom paths if set
+    if (this.projectPath) {
+      basePaths.push(path.join(this.projectPath, 'custom'));
+    }
 
     try {
-      // Check if custom directory exists
-      if (!fs.existsSync(this.CUSTOM_BASE_PATH)) {
-        return attributes;
-      }
+      for (const basePath of basePaths) {
+        // Check if custom directory exists
+        if (!fs.existsSync(basePath)) {
+          continue;
+        }
 
-      // Read categories (subdirectories under config/)
-      const categories = fs
-        .readdirSync(this.CUSTOM_BASE_PATH, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name);
+        // Read categories (subdirectories under custom/)
+        const categories = fs
+          .readdirSync(basePath, { withFileTypes: true })
+          .filter(dirent => dirent.isDirectory())
+          .map(dirent => dirent.name);
 
-      // For each category, list .ts files
-      for (const category of categories) {
-        const categoryPath = path.join(this.CUSTOM_BASE_PATH, category);
-        const files = fs
-          .readdirSync(categoryPath)
-          .filter(file => file.endsWith('.ts') && !file.endsWith('.d.ts'));
+        // For each category, list .ts files
+        for (const category of categories) {
+          const categoryPath = path.join(basePath, category);
+          const files = fs
+            .readdirSync(categoryPath)
+            .filter(file => file.endsWith('.ts') && !file.endsWith('.d.ts'));
 
-        for (const file of files) {
-          const attributeName = file.replace('.ts', '');
-          attributes.push(`custom/${category}/${attributeName}`);
+          for (const file of files) {
+            const attributeName = file.replace('.ts', '');
+            // Normalize to "quality" format for consistency
+            const normalizedCategory = category === 'qualities' ? 'quality' : category;
+            const attrPath = `custom/${normalizedCategory}/${attributeName}`;
+            if (!attributes.includes(attrPath)) {
+              attributes.push(attrPath);
+            }
+          }
         }
       }
 

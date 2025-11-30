@@ -46,7 +46,7 @@ export class LLMGenerator {
     const resolvedRegion = region || process.env.AWS_REGION || 'ap-southeast-2';
     // Allow injection for testing, otherwise use factory
     this.client = client || LLMClientFactory.create({ region: resolvedRegion });
-    Logger.info(
+    Logger.debug(
       `[LLMGenerator] Initialized with ${client ? 'injected' : 'factory'} client (region: ${resolvedRegion})`
     );
   }
@@ -59,16 +59,16 @@ export class LLMGenerator {
     // Apply default values for optional fields
     const resolvedConfig: ResolvedLLMConfig = applyGeneratorDefaults(modelConfig);
 
-    Logger.info(`[LLMGenerator] Preparing to generate with model: ${resolvedConfig.modelId}`);
-    Logger.info(
+    Logger.debug(`[LLMGenerator] Preparing to generate with model: ${resolvedConfig.modelId}`);
+    Logger.debug(
       `[LLMGenerator] Config - temperature: ${resolvedConfig.temperature}, topP: ${resolvedConfig.topP}, maxTokens: ${resolvedConfig.maxTokens}`
     );
 
     const prompt = this.buildPrompt(taskPrompt, inputs);
-    Logger.info(`[LLMGenerator] Prompt length: ${prompt.length} characters`);
+    Logger.debug(`[LLMGenerator] Prompt length: ${prompt.length} characters`);
 
     const modelId = resolvedConfig.modelId.replace('bedrock:', '');
-    Logger.info(`[LLMGenerator] Invoking model: ${modelId}`);
+    Logger.debug(`[LLMGenerator] Invoking model: ${modelId}`);
 
     const timestamp = new Date().toISOString();
 
@@ -82,7 +82,7 @@ export class LLMGenerator {
         max_tokens: resolvedConfig.maxTokens,
       };
 
-      Logger.info(`[LLMGenerator] Sending request via LLM client...`);
+      Logger.debug(`[LLMGenerator] Sending request via LLM client...`);
 
       // Use retry wrapper around client.chat
       const response = await retryWithBackoff(
@@ -95,11 +95,11 @@ export class LLMGenerator {
       const { content, usage, latency_ms } = response;
 
       Logger.info(`[LLMGenerator] ✓ Generation completed`);
-      Logger.info(`[LLMGenerator] Generated output length: ${content.length} characters`);
-      Logger.info(
+      Logger.debug(`[LLMGenerator] Generated output length: ${content.length} characters`);
+      Logger.debug(
         `[LLMGenerator] Tokens: ${usage.prompt_tokens} input, ${usage.completion_tokens} output, ${usage.total_tokens} total`
       );
-      Logger.info(`[LLMGenerator] Latency: ${latency_ms}ms`);
+      Logger.debug(`[LLMGenerator] Latency: ${latency_ms}ms`);
 
       return {
         output: content,

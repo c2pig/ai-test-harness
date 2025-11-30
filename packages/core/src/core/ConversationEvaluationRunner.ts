@@ -46,7 +46,7 @@ export class ConversationEvaluationRunner extends BaseRunner {
     this.judge = new ConversationJudge(config.evaluationPlan.region);
 
     const outputDir = `./outputs/${tenantName}`;
-    Logger.info(`[${runnerName}] Output directory: ${outputDir}/${runTimestamp}`);
+    Logger.debug(`[${runnerName}] Output directory: ${outputDir}/${runTimestamp}`);
     const artifactWriter = new ArtifactWriter(outputDir, runTimestamp, 'conversation-evaluation');
 
     // Validate quality attributes and build schema using BaseRunner
@@ -124,7 +124,7 @@ export class ConversationEvaluationRunner extends BaseRunner {
 
     // Fetch conversations from DynamoDB
     const conversations = await conversationsConnector.fetch();
-    Logger.info(`[ConversationEvaluationRunner] Processing ${conversations.length} conversations`);
+    Logger.debug(`[ConversationEvaluationRunner] Processing ${conversations.length} conversations`);
 
     const results: any[] = [];
 
@@ -134,11 +134,11 @@ export class ConversationEvaluationRunner extends BaseRunner {
       Logger.debug(
         `[ConversationEvaluationRunner] Processing conversation ${i + 1}/${conversations.length} - ${dbConversation.conversationId}`
       );
-      Logger.info(`[ConversationEvaluationRunner] Record ID: ${dbConversation.recordId}`);
-      Logger.info(
+      Logger.debug(`[ConversationEvaluationRunner] Record ID: ${dbConversation.recordId}`);
+      Logger.debug(
         `[ConversationEvaluationRunner] User messages: ${dbConversation.userMessages.length}`
       );
-      Logger.info(
+      Logger.debug(
         `[ConversationEvaluationRunner] Total turns: ${dbConversation.messageHistory.length}`
       );
 
@@ -146,12 +146,12 @@ export class ConversationEvaluationRunner extends BaseRunner {
         // Convert DynamoDB conversation to ConversationResult format
         const conversationResult = this.convertToConversationResult(dbConversation);
 
-        Logger.info(
+        Logger.debug(
           `[ConversationEvaluationRunner] ✓ Conversation converted - ${conversationResult.turns.length} turns, ${conversationResult.totalLatencyMs}ms`
         );
 
         // Evaluate conversation using judge
-        Logger.info(`[ConversationEvaluationRunner] Starting conversation evaluation...`);
+        Logger.debug(`[ConversationEvaluationRunner] Starting conversation evaluation...`);
 
         // Apply judge model defaults
         const judgeConfig = applyJudgeDefaults(config.evaluationPlan.judgeModel);
@@ -172,7 +172,7 @@ export class ConversationEvaluationRunner extends BaseRunner {
           judgeConfig
         );
 
-        Logger.info(
+        Logger.debug(
           `[ConversationEvaluationRunner] ✓ Assessment completed for conversation ${dbConversation.conversationId}`
         );
 
@@ -231,11 +231,11 @@ export class ConversationEvaluationRunner extends BaseRunner {
       }
     }
 
-    Logger.info(`[ConversationEvaluationRunner] ========================================`);
-    Logger.info(
+    Logger.debug(`[ConversationEvaluationRunner] ========================================`);
+    Logger.debug(
       `[ConversationEvaluationRunner] All conversations completed - Total results: ${results.length}`
     );
-    Logger.info(`[ConversationEvaluationRunner] ========================================`);
+    Logger.debug(`[ConversationEvaluationRunner] ========================================`);
 
     if (results.length > 0) {
       // Build benchmark metadata for tracking test configuration
@@ -277,14 +277,14 @@ export class ConversationEvaluationRunner extends BaseRunner {
         },
       };
 
-      Logger.info(`[ConversationEvaluationRunner] Writing test summary with metadata...`);
+      Logger.debug(`[ConversationEvaluationRunner] Writing test summary with metadata...`);
       artifactWriter.writeTestSummary(metadata, results, runTimestamp);
     }
 
     this.printSummary(results);
 
     // Clean up AWS SDK clients to prevent hanging
-    Logger.info(`[ConversationEvaluationRunner] Cleaning up resources...`);
+    Logger.debug(`[ConversationEvaluationRunner] Cleaning up resources...`);
     this.judge?.destroy();
     Logger.info(`[ConversationEvaluationRunner] ✓ Resources cleaned up`);
 
@@ -477,7 +477,7 @@ export class ConversationEvaluationRunner extends BaseRunner {
     });
 
     fs.writeFileSync(agentConfigPath, yamlContent, 'utf-8');
-    Logger.info(
+    Logger.debug(
       `[ConversationEvaluationRunner] ✓ Wrote agent configuration to: 0-agent-config.yaml`
     );
   }
@@ -538,7 +538,7 @@ export class ConversationEvaluationRunner extends BaseRunner {
 
     if (results.length === 0) {
       lines.push('No conversations processed');
-      Logger.info(lines.join('\n'));
+      Logger.debug(lines.join('\n'));
       return;
     }
 
@@ -589,6 +589,6 @@ export class ConversationEvaluationRunner extends BaseRunner {
     lines.push('='.repeat(80));
     lines.push(`Total conversations: ${results.length}`);
 
-    Logger.info(lines.join('\n'));
+    Logger.debug(lines.join('\n'));
   }
 }

@@ -77,7 +77,7 @@ export class ConversationController {
     this.agentSimulator = new ConversationSimulator(agentConfig);
     this.controlConfig = controlConfig;
 
-    Logger.info(`[ConversationController] Initialized with maxTurns: ${controlConfig.maxTurns}`);
+    Logger.debug(`[ConversationController] Initialized with maxTurns: ${controlConfig.maxTurns}`);
   }
 
   /**
@@ -115,11 +115,11 @@ export class ConversationController {
       );
     }
 
-    Logger.info(
+    Logger.debug(
       `[ConversationController] Starting dynamic conversation for scenario: ${scenario.scenarioId}`
     );
-    Logger.info(`[ConversationController] Session ID: ${sessionId}`);
-    Logger.info(`[ConversationController] Max turns: ${this.controlConfig.maxTurns}`);
+    Logger.debug(`[ConversationController] Session ID: ${sessionId}`);
+    Logger.debug(`[ConversationController] Max turns: ${this.controlConfig.maxTurns}`);
 
     const turns: ConversationTurnDetail[] = [];
     let totalLatencyMs = 0;
@@ -152,7 +152,7 @@ export class ConversationController {
     let turnCount = 0;
     while (turnCount < this.controlConfig.maxTurns) {
       turnCount++;
-      Logger.info(`[ConversationController] === Turn ${turnCount} ===`);
+      Logger.debug(`[ConversationController] === Turn ${turnCount} ===`);
 
       // PHASE 1: User simulator generates message
       const userTurnStart = Date.now();
@@ -203,10 +203,10 @@ export class ConversationController {
         latencyMs: userTurnLatency,
       });
 
-      Logger.info(
+      Logger.debug(
         `[ConversationController] Turn ${turnCount} - User: ${userResponse.message.substring(0, 50)}...`
       );
-      Logger.info(`[ConversationController] User signaled end: ${userResponse.shouldEnd}`);
+      Logger.debug(`[ConversationController] User signaled end: ${userResponse.shouldEnd}`);
 
       // PHASE 2: Agent responds to user message
       const agentTurnStart = Date.now();
@@ -258,11 +258,11 @@ export class ConversationController {
         lambdaError: agentTurn.lambdaError, // Pass through Lambda error if present
       });
 
-      Logger.info(
+      Logger.debug(
         `[ConversationController] Turn ${turnCount} - Agent: ${agentMessage.substring(0, 50)}...`
       );
       if (agentToolCalls.length > 0) {
-        Logger.info(
+        Logger.debug(
           `[ConversationController] Agent tool calls: ${agentToolCalls.map(tc => tc.toolName).join(', ')}`
         );
       }
@@ -276,7 +276,7 @@ export class ConversationController {
       );
 
       if (terminationDecision.shouldTerminate) {
-        Logger.info(
+        Logger.debug(
           `[ConversationController] Termination triggered: ${terminationDecision.reasons.join(', ')}`
         );
         break;
@@ -286,12 +286,12 @@ export class ConversationController {
     const endTime = new Date().toISOString();
 
     Logger.info(`[ConversationController] ✓ Conversation complete`);
-    Logger.info(`[ConversationController] Turns: ${turns.length / 2} (${turns.length} messages)`);
-    Logger.info(
+    Logger.debug(`[ConversationController] Turns: ${turns.length / 2} (${turns.length} messages)`);
+    Logger.debug(
       `[ConversationController] Termination reasons: ${terminationDecision.reasons.join(', ')}`
     );
-    Logger.info(`[ConversationController] Total latency: ${totalLatencyMs}ms`);
-    Logger.info(
+    Logger.debug(`[ConversationController] Total latency: ${totalLatencyMs}ms`);
+    Logger.debug(
       `[ConversationController] User tokens: ${userSimulatorTotalTokens}, Agent tokens: ${agentTotalTokens}`
     );
 
@@ -333,7 +333,7 @@ export class ConversationController {
     const hasEscalation = agentToolCalls.some(tc => tc.toolName.toLowerCase().includes('escalate'));
     if (hasEscalation) {
       reasons.push('agent_escalation');
-      Logger.info('[ConversationController] Termination condition met: agent_escalation');
+      Logger.debug('[ConversationController] Termination condition met: agent_escalation');
     }
 
     // Condition 2: Completion tool called (tool name contains "complete" or "finish")
@@ -343,19 +343,19 @@ export class ConversationController {
     });
     if (hasCompletion) {
       reasons.push('completion_tool_called');
-      Logger.info('[ConversationController] Termination condition met: completion_tool_called');
+      Logger.debug('[ConversationController] Termination condition met: completion_tool_called');
     }
 
     // Condition 3: User simulator signaled end
     if (userSignaledEnd) {
       reasons.push('user_simulator_ends');
-      Logger.info('[ConversationController] Termination condition met: user_simulator_ends');
+      Logger.debug('[ConversationController] Termination condition met: user_simulator_ends');
     }
 
     // Condition 4: Max turns reached
     if (turnCount >= maxTurns) {
       reasons.push('max_turns_reached');
-      Logger.info('[ConversationController] Termination condition met: max_turns_reached');
+      Logger.debug('[ConversationController] Termination condition met: max_turns_reached');
     }
 
     return {

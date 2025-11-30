@@ -9,7 +9,7 @@ export class SecretsManager {
   constructor() {
     const region = process.env.AWS_REGION || 'ap-southeast-1';
     this.client = new SecretsManagerClient({ region });
-    Logger.info(`[SecretsManager] Initialized client for region: ${region}`);
+    Logger.debug(`[SecretsManager] Initialized client for region: ${region}`);
   }
 
   async getSecret(secretName: string): Promise<any> {
@@ -22,12 +22,12 @@ export class SecretsManager {
     const region = process.env.AWS_REGION || 'ap-southeast-1';
     const arn = `arn:aws:secretsmanager:${region}:${accountId}:secret:${secretName}`;
 
-    Logger.info(`[SecretsManager] Retrieving secret: ${secretName}`);
-    Logger.info(`[SecretsManager] ARN: ${arn}`);
+    Logger.debug(`[SecretsManager] Retrieving secret: ${secretName}`);
+    Logger.debug(`[SecretsManager] ARN: ${arn}`);
 
     try {
       const command = new GetSecretValueCommand({ SecretId: arn });
-      Logger.info(`[SecretsManager] Sending GetSecretValue request...`);
+      Logger.debug(`[SecretsManager] Sending GetSecretValue request...`);
       const response = await this.client.send(command);
 
       const secret = response.SecretString ? JSON.parse(response.SecretString) : null;
